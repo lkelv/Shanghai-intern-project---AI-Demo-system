@@ -1,0 +1,42 @@
+{
+  "name": "OnePromise AI Training Course",
+  "currency": "USD",
+  "tiers": [
+    {
+      "id": "starter",
+      "name": "Starter",
+      "price": 149,
+      "blurb": "Self-paced fundamentals for individuals getting started with AI.",
+      "features": [
+        "8 core modules, self-paced",
+        "Hands-on notebooks",
+        "Community forum access",
+        "Certificate of completion"
+      ]
+    },
+    {
+      "id": "professional",
+      "name": "Professional",
+      "price": 499,
+      "blurb": "For practitioners who want real projects and mentor feedback.",
+      "features": [
+        "Everything in Starter",
+        "12 advanced modules",
+        "3 graded projects with feedback",
+        "Live weekly Q&A sessions"
+      ]
+    },
+    {
+      "id": "team",
+      "name": "Team",
+      "price": 1299,
+      "blurb": "For teams rolling out AI skills across the organisation.",
+      "features": [
+        "Everything in Professional",
+        "Up to 10 seats",
+        "Private cohort & onboarding",
+        "Admin progress dashboard"
+      ]
+    }
+  ]
+}
