@@ -12,9 +12,15 @@ export function nowTime(): string {
   return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
-export const greeting: Message = {
-  id: 'greeting',
-  role: 'bot',
-  text: "👋 Hi there! I'm the OnePromise assistant. Ask me anything, and I can connect you with our team.",
-  time: nowTime(),
+const GREETING_TEXT =
+  "👋 Hi there! I'm the OnePromise assistant. Ask me anything, and I can connect you with our team."
+
+// A fresh greeting message — used on first load and whenever the chat restarts.
+export function makeGreeting(): Message {
+  return {
+    id: `greeting-${Math.random().toString(36).slice(2)}`,
+    role: 'bot',
+    text: GREETING_TEXT,
+    time: nowTime(),
+  }
 }

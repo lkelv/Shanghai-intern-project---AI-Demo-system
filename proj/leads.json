@@ -18,5 +18,15 @@
     "messageCount": 6,
     "createdAt": "2026-07-01T03:18:09.042Z",
     "updatedAt": "2026-07-01T03:18:58.028Z"
+  },
+  {
+    "id": "15de723d-6610-483d-970e-8415a2ae5637",
+    "email": "demo1@example.com",
+    "name": null,
+    "need": "The customer wants help creating an account and would like to be connected to a human.",
+    "source": "whatsapp-demo",
+    "messageCount": 8,
+    "createdAt": "2026-07-01T03:25:05.367Z",
+    "updatedAt": "2026-07-01T03:25:11.937Z"
   }
 ]

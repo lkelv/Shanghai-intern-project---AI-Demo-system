@@ -8,6 +8,9 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+    // The backend writes leads.json into this folder; don't let that trigger a
+    // full-page reload that would wipe the chat mid-conversation.
+    watch: { ignored: ['**/leads.json'] },
     proxy: {
       // Forward API calls to the local backend so the OpenRouter key stays
       // server-side and the browser talks to a same-origin /api path.

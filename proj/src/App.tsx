@@ -1,16 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
-import { greeting, nowTime, type Message } from './chat'
+import { makeGreeting, nowTime, type Message } from './chat'
 
 function makeId() {
   return Math.random().toString(36).slice(2)
 }
 
 function App() {
-  const [messages, setMessages] = useState<Message[]>([greeting])
+  const [messages, setMessages] = useState<Message[]>(() => [makeGreeting()])
   const [input, setInput] = useState('')
   const [typing, setTyping] = useState(false)
 
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  function resetChat() {
+    setMessages([makeGreeting()])
+    setInput('')
+    setTyping(false)
+  }
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -83,6 +89,27 @@ function App() {
               online · replies instantly
             </p>
           </div>
+          <button
+            type="button"
+            onClick={resetChat}
+            className="flex shrink-0 items-center gap-1.5 border border-wa-divider px-2.5 py-1.5 font-mono text-[11px] text-wa-muted transition-colors hover:border-wa-green hover:text-wa-text"
+          >
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+              <path d="M3 3v5h5" />
+            </svg>
+            Restart
+          </button>
         </header>
 
         {/* Messages */}
