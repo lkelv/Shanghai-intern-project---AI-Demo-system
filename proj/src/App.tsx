@@ -1,12 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import {
-  getBotReply,
-  greeting,
-  initialBotState,
-  nowTime,
-  type BotState,
-  type Message,
-} from './mockBot'
+import { greeting, nowTime, type Message } from './chat'
 
 function makeId() {
   return Math.random().toString(36).slice(2)
@@ -14,7 +7,6 @@ function makeId() {
 
 function App() {
   const [messages, setMessages] = useState<Message[]>([greeting])
-  const [botState, setBotState] = useState<BotState>(initialBotState)
   const [input, setInput] = useState('')
   const [typing, setTyping] = useState(false)
 
@@ -27,7 +19,7 @@ function App() {
     })
   }, [messages, typing])
 
-  function send() {
+  async function send() {
     const text = input.trim()
     if (!text || typing) return
 
@@ -37,23 +29,34 @@ function App() {
       text,
       time: nowTime(),
     }
-    setMessages((m) => [...m, userMsg])
+    const history = [...messages, userMsg]
+    setMessages(history)
     setInput('')
     setTyping(true)
 
-    // Stand-in for the backend round-trip. Swap getBotReply() for a fetch to
-    // the local /api/chat endpoint once the OpenRouter backend exists.
-    const { reply, state } = getBotReply(text, botState)
-    setBotState(state)
+    // Ask the local backend, which holds the OpenRouter key and system prompt.
+    let reply: string
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: history.map((m) => ({ role: m.role, content: m.text })),
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data?.error || 'Request failed')
+      reply = data.reply
+    } catch {
+      reply =
+        "Sorry — I couldn't reach the assistant just now. Please make sure the backend is running and try again."
+    }
 
-    const delay = 650 + Math.min(reply.length * 12, 900)
-    window.setTimeout(() => {
-      setMessages((m) => [
-        ...m,
-        { id: makeId(), role: 'bot', text: reply, time: nowTime() },
-      ])
-      setTyping(false)
-    }, delay)
+    setMessages((m) => [
+      ...m,
+      { id: makeId(), role: 'bot', text: reply, time: nowTime() },
+    ])
+    setTyping(false)
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {

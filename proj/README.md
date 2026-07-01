@@ -1,32 +1,56 @@
-# React + TypeScript + Vite
+# OnePromise Chat Demo
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A WhatsApp-style AI chat demo for customer acquisition. The bot auto-replies to
+inbound questions and guides prospects toward leaving their email and need.
 
-Currently, two official plugins are available:
+- **Frontend** — React + TypeScript + Vite + Tailwind ([src/App.tsx](src/App.tsx)).
+- **Backend** — a tiny zero-dependency Node server ([server.js](server.js)) that
+  holds the OpenRouter API key and forwards chat requests to the model. The key
+  is **never** shipped to the browser.
+- **Model** — `openai/gpt-oss-20b` via [OpenRouter](https://openrouter.ai).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Setup
 
-## React Compiler
+The API key lives in `proj/.env` (git-ignored):
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```
+OPEN_ROUTER_API_KEY = sk-or-...
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Optional overrides: `OPENROUTER_MODEL` (defaults to `openai/gpt-oss-20b`) and
+`API_PORT` (defaults to `8791`).
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+## Run
+
+```bash
+npm run dev
+```
+
+This starts both processes together:
+
+- web (Vite) on http://localhost:5173
+- api (Node) on http://localhost:8791
+
+The frontend calls `/api/chat`, which Vite proxies to the backend, so the
+browser only ever talks to a same-origin path. Open http://localhost:5173.
+
+You can also run them separately with `npm run web` and `npm run server`.
+
+## How it works
+
+1. The browser POSTs the conversation history to `/api/chat`.
+2. [server.js](server.js) prepends the OnePromise system prompt, adds the API
+   key, and calls OpenRouter.
+3. The model's reply is returned and rendered as a chat bubble.
+
+## Next step
+
+Lead persistence: when a message contains an email + a described need, save the
+lead as a record in a local `leads.json`. The backend in [server.js](server.js)
+is where that endpoint will live.
