@@ -81,5 +81,25 @@
     "source": "journey-demo",
     "createdAt": "2026-07-01T04:22:45.548Z",
     "updatedAt": "2026-07-01T04:23:08.811Z"
+  },
+  {
+    "id": "15ec23ec-a79e-4954-9ea1-a8c1e72f994d",
+    "email": null,
+    "name": null,
+    "need": null,
+    "stage": "conversion",
+    "messages": [
+      {
+        "stage": "conversion",
+        "role": "assistant",
+        "text": "We have three plans: Starter for $149, Professional for $499, and Team for $1,299.\n\nBased on your interest in practical, hands‑on learning and a solid progression, the **Professional ($499)** plan is the best fit: it gives you the full curriculum plus real projects and mentor feedback, plus live Q&A to keep you on track.\n\nIf that sounds right, let me know and I’ll help you pick it!",
+        "at": "2026-07-01T04:23:58.596Z"
+      }
+    ],
+    "chosenOption": null,
+    "payment": null,
+    "source": "journey-demo",
+    "createdAt": "2026-07-01T04:23:58.598Z",
+    "updatedAt": "2026-07-01T04:23:58.598Z"
   }
 ]
