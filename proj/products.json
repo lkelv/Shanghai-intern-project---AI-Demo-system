@@ -18,6 +18,7 @@
       "id": "professional",
       "name": "Professional",
       "price": 499,
+      "popular": true,
       "blurb": "For practitioners who want real projects and mentor feedback.",
       "features": [
         "Everything in Starter",

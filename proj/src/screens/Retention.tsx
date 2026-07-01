@@ -4,21 +4,23 @@ import { ChatPanel } from '../components/ChatPanel'
 import { botMessage, userMessage, type Message } from '../chat'
 import { sendChat } from '../api'
 import { wantsPlans, type StageId } from '../journey'
+import { AdvanceBar } from '../components/AdvanceBar'
 
 interface RetentionProps {
   sessionId: string
   messages: Message[]
   onAppend: (stage: StageId, ...msgs: Message[]) => void
-  onGoToConversion: () => void
+  onAdvance: () => void
 }
 
 export function Retention({
   sessionId,
   messages,
   onAppend,
-  onGoToConversion,
+  onAdvance,
 }: RetentionProps) {
   const [typing, setTyping] = useState(false)
+  const followedUp = messages.some((m) => m.role === 'bot')
 
   async function nextDay() {
     setTyping(true)
@@ -43,7 +45,7 @@ export function Retention({
     // answering with a wall of text here.
     if (wantsPlans(text)) {
       onAppend('retention', userMessage(text))
-      onGoToConversion()
+      onAdvance()
       return
     }
 
@@ -85,6 +87,11 @@ export function Retention({
         typing={typing}
         onSend={handleSend}
         placeholder="Reply to the follow-up…"
+        banner={
+          followedUp && !typing ? (
+            <AdvanceBar label="See the plans" onClick={onAdvance} />
+          ) : null
+        }
         emptyState={
           <div className="mx-auto mt-10 max-w-[80%] text-center">
             <p className="text-[15px] text-wa-text">A day goes by…</p>

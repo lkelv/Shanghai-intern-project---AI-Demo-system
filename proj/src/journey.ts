@@ -30,6 +30,7 @@ export interface ProductTier {
   price: number
   blurb: string
   features: string[]
+  popular?: boolean
 }
 
 export interface Catalog {

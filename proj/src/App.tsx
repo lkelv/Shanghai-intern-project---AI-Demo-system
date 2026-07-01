@@ -2,12 +2,21 @@ import { useEffect, useState } from 'react'
 import { makeGreeting, type Message } from './chat'
 import { STAGES, type ChosenOption, type PaymentInfo, type RunState, type StageId } from './journey'
 import { DevPanel } from './components/DevPanel'
+import { PhoneStatusBar } from './components/PhoneStatusBar'
 import { Acquisition } from './screens/Acquisition'
 import { Retention } from './screens/Retention'
 import { Conversion } from './screens/Conversion'
 import { Payment } from './screens/Payment'
 
 const STORAGE_KEY = 'op_run_v2'
+
+// Which phone-chrome tint each stage's "app" uses.
+const STATUS_VARIANT: Record<StageId, 'whatsapp' | 'store' | 'checkout'> = {
+  acquisition: 'whatsapp',
+  retention: 'whatsapp',
+  conversion: 'store',
+  payment: 'checkout',
+}
 
 function newSessionId(): string {
   return typeof crypto !== 'undefined' && crypto.randomUUID
@@ -103,13 +112,16 @@ function App() {
       {/* The product: just the chat / options */}
       <main className="flex flex-1 items-stretch justify-center md:items-center md:py-8">
         <div className="wa-rise flex h-[100svh] w-full flex-col overflow-hidden bg-wa-panel md:h-[780px] md:max-w-[460px] md:border md:border-wa-divider">
+          <PhoneStatusBar variant={STATUS_VARIANT[stage.id]} />
+
           {stage.id === 'acquisition' && (
             <Acquisition
               sessionId={run.sessionId}
               messages={run.messages.acquisition}
+              emailCaptured={run.email != null}
               onAppend={appendMessage}
               onEmail={(email) => update({ email })}
-              onGoToConversion={() => goToStage(2)}
+              onAdvance={() => goToStage(1)}
             />
           )}
           {stage.id === 'retention' && (
@@ -117,7 +129,7 @@ function App() {
               sessionId={run.sessionId}
               messages={run.messages.retention}
               onAppend={appendMessage}
-              onGoToConversion={() => goToStage(2)}
+              onAdvance={() => goToStage(2)}
             />
           )}
           {stage.id === 'conversion' && (

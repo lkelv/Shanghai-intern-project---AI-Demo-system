@@ -78,7 +78,9 @@ export function Payment({
   // ---- Receipt ----
   if (payment) {
     return (
-      <div className="min-h-0 flex-1 overflow-y-auto bg-neutral-100 px-5 py-6 text-neutral-900">
+      <div className="flex min-h-0 flex-1 flex-col bg-neutral-100 text-neutral-900">
+        <CheckoutHeader />
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6">
         <div className="mx-auto max-w-[380px] wa-pop">
           <div className="border border-neutral-300 bg-white">
             <div className="flex items-center gap-3 border-b border-neutral-200 bg-emerald-600 px-5 py-4 text-white">
@@ -121,23 +123,19 @@ export function Payment({
             demo · no real payment was taken · saved to journey.json
           </p>
         </div>
+        </div>
       </div>
     )
   }
 
   // ---- Checkout form ----
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto bg-neutral-100 px-5 py-6 text-neutral-900">
-      <div className="mx-auto max-w-[380px]">
-        <div className="flex items-center justify-between">
-          <h2 className="text-[18px] font-semibold">Checkout</h2>
-          <span className="font-mono text-[11px] text-neutral-400">
-            🔒 test mode
-          </span>
-        </div>
-
+    <div className="flex min-h-0 flex-1 flex-col bg-neutral-100 text-neutral-900">
+      <CheckoutHeader />
+      <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6">
+        <div className="mx-auto max-w-[380px]">
         {/* Order summary */}
-        <div className="mt-4 flex items-center justify-between border border-neutral-300 bg-white px-4 py-3">
+        <div className="flex items-center justify-between border border-neutral-300 bg-white px-4 py-3">
           <div>
             <p className="text-[14px] font-medium">{chosenOption.name}</p>
             <p className="text-[12px] text-neutral-500">OnePromise AI Course</p>
@@ -147,8 +145,15 @@ export function Payment({
           </span>
         </div>
 
+        <div className="mt-5 flex items-center justify-between">
+          <span className="text-[12px] font-medium text-neutral-600">
+            Card details
+          </span>
+          <CardBrands />
+        </div>
+
         {/* Card form */}
-        <div className="mt-4 flex flex-col gap-3">
+        <div className="mt-3 flex flex-col gap-3">
           <Field label="Name on card">
             <input
               value={cardName}
@@ -191,14 +196,58 @@ export function Payment({
           type="button"
           onClick={pay}
           disabled={!canPay}
-          className="mt-5 w-full bg-neutral-900 py-3 text-[15px] font-semibold text-white transition-opacity disabled:opacity-40"
+          className="mt-5 flex w-full items-center justify-center gap-2 bg-neutral-900 py-3 text-[15px] font-semibold text-white transition-opacity disabled:opacity-40"
         >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+            <rect x="4" y="11" width="16" height="10" rx="2" />
+            <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+          </svg>
           {paying ? 'Processing…' : `Pay $${chosenOption.price}`}
         </button>
         <p className="mt-3 text-center font-mono text-[11px] text-neutral-400">
           No real money moves — this is a mock checkout.
         </p>
+        </div>
       </div>
+    </div>
+  )
+}
+
+function CheckoutHeader() {
+  return (
+    <header className="flex items-center justify-between border-b border-neutral-200 bg-white px-4 py-3">
+      <div className="flex items-center gap-2">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-neutral-900" aria-hidden="true">
+          <rect x="4" y="11" width="16" height="10" rx="2" />
+          <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+        </svg>
+        <p className="text-[15px] font-semibold text-neutral-900">
+          Secure checkout
+        </p>
+      </div>
+      <span className="font-mono text-[10px] uppercase tracking-wide text-neutral-400">
+        test mode
+      </span>
+    </header>
+  )
+}
+
+function CardBrands() {
+  const brands = [
+    { label: 'VISA', cls: 'text-[#1a1f71]' },
+    { label: 'MC', cls: 'text-[#eb001b]' },
+    { label: 'AMEX', cls: 'text-[#2e77bc]' },
+  ]
+  return (
+    <div className="flex items-center gap-1">
+      {brands.map((b) => (
+        <span
+          key={b.label}
+          className={`border border-neutral-200 bg-white px-1.5 py-0.5 font-mono text-[9px] font-bold ${b.cls}`}
+        >
+          {b.label}
+        </span>
+      ))}
     </div>
   )
 }
