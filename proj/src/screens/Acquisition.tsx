@@ -3,7 +3,7 @@ import { ChatHeader } from '../components/ChatHeader'
 import { ChatPanel } from '../components/ChatPanel'
 import { botMessage, userMessage, type Message } from '../chat'
 import { sendChat } from '../api'
-import type { StageId } from '../journey'
+import { wantsPlans, type StageId } from '../journey'
 
 const EMAIL_RE = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i
 
@@ -12,6 +12,7 @@ interface AcquisitionProps {
   messages: Message[]
   onAppend: (stage: StageId, ...msgs: Message[]) => void
   onEmail: (email: string) => void
+  onGoToConversion: () => void
 }
 
 export function Acquisition({
@@ -19,17 +20,32 @@ export function Acquisition({
   messages,
   onAppend,
   onEmail,
+  onGoToConversion,
 }: AcquisitionProps) {
   const [typing, setTyping] = useState(false)
 
   async function handleSend(text: string) {
     const user = userMessage(text)
     const next = [...messages, user]
-    onAppend('acquisition', user)
-    setTyping(true)
-
     const email = text.match(EMAIL_RE)?.[0]
     if (email) onEmail(email.toLowerCase())
+
+    // If they open by asking about pricing / wanting to buy, skip straight to
+    // the plans. Still fire the chat call in the background (when an email is
+    // present) so the lead is captured to journey.json before we move on.
+    if (wantsPlans(text)) {
+      onAppend('acquisition', user)
+      if (email) {
+        sendChat({ sessionId, stage: 'acquisition', messages: next }).catch(
+          () => {},
+        )
+      }
+      onGoToConversion()
+      return
+    }
+
+    onAppend('acquisition', user)
+    setTyping(true)
 
     let reply: string
     try {

@@ -109,6 +109,7 @@ function App() {
               messages={run.messages.acquisition}
               onAppend={appendMessage}
               onEmail={(email) => update({ email })}
+              onGoToConversion={() => goToStage(2)}
             />
           )}
           {stage.id === 'retention' && (
@@ -116,12 +117,17 @@ function App() {
               sessionId={run.sessionId}
               messages={run.messages.retention}
               onAppend={appendMessage}
+              onGoToConversion={() => goToStage(2)}
             />
           )}
           {stage.id === 'conversion' && (
             <Conversion
               sessionId={run.sessionId}
               messages={run.messages.conversion}
+              priorMessages={[
+                ...run.messages.acquisition,
+                ...run.messages.retention,
+              ]}
               onAppend={appendMessage}
               chosenOption={run.chosenOption}
               onChoose={(option: ChosenOption) => update({ chosenOption: option })}

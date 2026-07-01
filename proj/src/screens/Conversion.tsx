@@ -9,6 +9,7 @@ const catalog = catalogData as Catalog
 interface ConversionProps {
   sessionId: string
   messages: Message[]
+  priorMessages: Message[]
   onAppend: (stage: StageId, ...msgs: Message[]) => void
   chosenOption: ChosenOption | null
   onChoose: (option: ChosenOption) => void
@@ -18,6 +19,7 @@ interface ConversionProps {
 export function Conversion({
   sessionId,
   messages,
+  priorMessages,
   onAppend,
   chosenOption,
   onChoose,
@@ -27,7 +29,9 @@ export function Conversion({
   const [saving, setSaving] = useState<string | null>(null)
   const requested = useRef(false)
 
-  // Ask the AI to recommend a tier once, when the screen first opens.
+  // When the screen first opens, ask the AI to present the options and
+  // recommend one — using the earlier conversation as context so it always
+  // has something concrete to work from.
   useEffect(() => {
     if (requested.current || messages.length > 0) return
     requested.current = true
@@ -37,7 +41,7 @@ export function Conversion({
         const reply = await sendChat({
           sessionId,
           stage: 'conversion',
-          messages: [],
+          messages: priorMessages,
           nudge: true,
         })
         onAppend('conversion', botMessage(reply))
@@ -91,66 +95,10 @@ export function Conversion({
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto bg-wa-bg px-3 py-4">
-        {/* Product tiers */}
-        <ul className="flex flex-col gap-3">
-          {catalog.tiers.map((tier) => {
-            const selected = chosenOption?.id === tier.id
-            return (
-              <li
-                key={tier.id}
-                className={[
-                  'border bg-wa-panel p-4 transition-colors',
-                  selected
-                    ? 'border-wa-green'
-                    : 'border-wa-divider hover:border-wa-muted',
-                ].join(' ')}
-              >
-                <div className="flex items-baseline justify-between gap-3">
-                  <h3 className="text-[16px] font-semibold text-wa-text">
-                    {tier.name}
-                  </h3>
-                  <span className="font-mono text-[18px] font-bold text-wa-text">
-                    ${tier.price}
-                  </span>
-                </div>
-                <p className="mt-1 text-[13px] text-wa-muted">{tier.blurb}</p>
-                <ul className="mt-3 flex flex-col gap-1">
-                  {tier.features.map((f) => (
-                    <li
-                      key={f}
-                      className="flex gap-2 text-[13px] text-wa-text"
-                    >
-                      <span className="text-wa-green">✓</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  type="button"
-                  onClick={() => choose(tier.id)}
-                  disabled={saving === tier.id}
-                  className={[
-                    'mt-4 w-full py-2 text-[13px] font-semibold transition-colors',
-                    selected
-                      ? 'bg-wa-green text-[#04221c]'
-                      : 'border border-wa-green text-wa-green hover:bg-wa-green/10',
-                  ].join(' ')}
-                >
-                  {selected
-                    ? '✓ Selected'
-                    : saving === tier.id
-                      ? 'Saving…'
-                      : `Choose ${tier.name}`}
-                </button>
-              </li>
-            )
-          })}
-        </ul>
-
         {/* AI recommendation + Q&A */}
-        <div className="mt-5 border-t border-wa-divider pt-4">
+        <div>
           <p className="mb-2 font-mono text-[11px] text-wa-muted">
-            assistant · recommendation & questions
+            assistant · recommendation
           </p>
           <ul className="flex flex-col gap-2">
             {messages.map((m) => (
@@ -187,6 +135,64 @@ export function Conversion({
                 </div>
               </li>
             )}
+          </ul>
+        </div>
+
+        {/* Options — always shown, presented after the assistant's message */}
+        <div className="mt-5 border-t border-wa-divider pt-4">
+          <p className="mb-3 font-mono text-[11px] text-wa-muted">
+            choose a plan
+          </p>
+          <ul className="flex flex-col gap-3">
+            {catalog.tiers.map((tier) => {
+              const selected = chosenOption?.id === tier.id
+              return (
+                <li
+                  key={tier.id}
+                  className={[
+                    'border bg-wa-panel p-4 transition-colors',
+                    selected
+                      ? 'border-wa-green'
+                      : 'border-wa-divider hover:border-wa-muted',
+                  ].join(' ')}
+                >
+                  <div className="flex items-baseline justify-between gap-3">
+                    <h3 className="text-[16px] font-semibold text-wa-text">
+                      {tier.name}
+                    </h3>
+                    <span className="font-mono text-[18px] font-bold text-wa-text">
+                      ${tier.price}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-[13px] text-wa-muted">{tier.blurb}</p>
+                  <ul className="mt-3 flex flex-col gap-1">
+                    {tier.features.map((f) => (
+                      <li key={f} className="flex gap-2 text-[13px] text-wa-text">
+                        <span className="text-wa-green">✓</span>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    type="button"
+                    onClick={() => choose(tier.id)}
+                    disabled={saving === tier.id}
+                    className={[
+                      'mt-4 w-full py-2 text-[13px] font-semibold transition-colors',
+                      selected
+                        ? 'bg-wa-green text-[#04221c]'
+                        : 'border border-wa-green text-wa-green hover:bg-wa-green/10',
+                    ].join(' ')}
+                  >
+                    {selected
+                      ? '✓ Selected'
+                      : saving === tier.id
+                        ? 'Saving…'
+                        : `Choose ${tier.name}`}
+                  </button>
+                </li>
+              )
+            })}
           </ul>
         </div>
       </div>

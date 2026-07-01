@@ -1,98 +1,85 @@
 [
   {
-    "id": "5f259581-1d61-4962-ab81-7220b2f5e915",
-    "email": "demo3@example.com",
+    "id": "353b8f9a-b2b7-422c-8fae-63b1dc377e7e",
+    "email": null,
     "name": null,
-    "need": "learning about AI business strategy",
+    "need": null,
     "stage": "conversion",
     "messages": [
       {
         "stage": "acquisition",
         "role": "user",
-        "text": "Hello",
-        "at": "2026-07-01T03:59:49.654Z"
+        "text": "hello",
+        "at": "2026-07-01T04:22:38.185Z"
       },
       {
         "stage": "acquisition",
         "role": "assistant",
-        "text": "Hey! 👋 How can I help you explore our OnePromise AI Training Course? If you'd like to chat more in detail, just drop me your email and a quick note about what you're looking to learn, and our team will follow up.",
-        "at": "2026-07-01T03:59:49.654Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "user",
-        "text": "can you connect me to the team",
-        "at": "2026-07-01T03:59:54.993Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "assistant",
-        "text": "Sure thing! Can you share your email address and a quick line about what you’re hoping to learn or achieve with the course? Our team will reach out to you right away.",
-        "at": "2026-07-01T03:59:54.993Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "user",
-        "text": "demo3@example.com",
-        "at": "2026-07-01T04:00:10.648Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "assistant",
-        "text": "Thanks! Could you give me a quick description of what you’re hoping to focus on or achieve with the course? That way our team can tailor the follow‑up.",
-        "at": "2026-07-01T04:00:10.648Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "user",
-        "text": "to learn about business in AI",
-        "at": "2026-07-01T04:00:24.891Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "assistant",
-        "text": "Got it! Just to make sure our team can help you best—could you give a quick note on what specific aspect of “business in AI” you’re most interested in (e.g., strategy, marketing, product development, or startup scaling)? Then we’ll have the right people connect with you.",
-        "at": "2026-07-01T04:00:24.891Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "user",
-        "text": "strategy",
-        "at": "2026-07-01T04:00:32.638Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "assistant",
-        "text": "Great—thanks for the details! OnePromise’s AI Training Course has a strong “AI Business Strategy” module, and our team will reach out shortly to dive deeper into how you can build and grow AI‑driven initiatives. If you have any quick questions in the meantime, just let me know!",
-        "at": "2026-07-01T04:00:32.638Z"
-      },
-      {
-        "stage": "retention",
-        "role": "assistant",
-        "text": "Hey there! 🚀 I hope you’re finding some time to dive into AI strategy thoughts. If you’d like a deeper playbook that blends strategy with real projects and mentor feedback, our **Professional** tier could be a great fit. No pressure—just let me know what you’re looking for, and I’ll gladly walk you through the next steps!",
-        "at": "2026-07-01T04:00:47.748Z"
+        "text": "Hey! 👋 How can I help you today? If you let me know your email and a quick note on what you’re looking to learn or build, I’ll forward it to the team so they can follow up.",
+        "at": "2026-07-01T04:22:38.185Z"
       },
       {
         "stage": "conversion",
         "role": "assistant",
-        "text": "**Professional ($499)** – It adds the 12 advanced modules and real‑world projects that dive into AI strategy and business use‑cases. It gives you the depth you need beyond just fundamentals, with mentor feedback and live Q&A to keep you moving forward.",
-        "at": "2026-07-01T04:01:29.236Z"
+        "text": "✨ We have three plans. **Starter** is $149 and is self‑paced with 8 core modules, hands‑on notebooks, a community forum, and a completion certificate.  \n**Professional** is $499, adds 12 advanced modules, 3 graded projects, and live weekly Q&A.  \n**Team** is $1299, gives everything in Professional plus up to 10 seats, a private cohort, onboarding, and an admin progress dashboard.\n\nIf you’re an individual just getting your feet wet with AI, the **Starter $149** plan is the most cost‑effective and gives you all the essentials to start. It’ll let you build a solid foundation and move into more advanced material when you’re ready.  \n\nLet me know which tier you’d like to go with, and I’ll walk you through the checkout!",
+        "at": "2026-07-01T04:22:40.879Z"
       },
       {
-        "stage": "retention",
+        "stage": "conversion",
         "role": "assistant",
-        "text": "Hey again! 😊 Just checking in—if you’re still exploring how AI can shape your business strategy, our **Professional** track gives hands‑on projects and mentor feedback, plus a solid foundation from the Starter module. No rush, but if it sounds right, I’m happy to help you get started!",
-        "at": "2026-07-01T04:01:42.719Z"
+        "text": "Great! Here’s what we offer:\n\n- **Starter** – $149: 8 core modules, hands‑on notebooks, community forum, and a certificate.  \n- **Professional** – $499: All Starter stuff plus 12 advanced modules, 3 graded projects with mentor feedback, and live weekly Q&A.  \n- **Team** – $1299: Everything in Professional plus up to 10 seats, a private cohort, onboarding support, and an admin progress dashboard.\n\nSince you’re just getting into AI and looking for a solid foundation, the **Starter** tier ($149) is usually the best fit—it gives you a strong base with practical notebooks and a certificate to show off. Ready to go ahead and pick it?",
+        "at": "2026-07-01T04:22:43.601Z"
+      }
+    ],
+    "chosenOption": null,
+    "payment": null,
+    "source": "journey-demo",
+    "createdAt": "2026-07-01T04:22:38.188Z",
+    "updatedAt": "2026-07-01T04:22:43.603Z"
+  },
+  {
+    "id": "d24e6674-8ffa-414e-8df6-edb1bad3cc9d",
+    "email": null,
+    "name": null,
+    "need": null,
+    "stage": "payment",
+    "messages": [
+      {
+        "stage": "acquisition",
+        "role": "user",
+        "text": "hello",
+        "at": "2026-07-01T04:22:45.541Z"
+      },
+      {
+        "stage": "acquisition",
+        "role": "assistant",
+        "text": "Hi! 👋 What would you like to chat about—our AI Training Course, a specific module, or something else? Once I’ve got a clear idea, I’ll capture your email and a quick note of what you’re looking for so the team can follow up.",
+        "at": "2026-07-01T04:22:45.541Z"
+      },
+      {
+        "stage": "payment",
+        "role": "assistant",
+        "text": "Your order for the OnePromise AI Training Course – Starter tier at $149 has been received! 🎉 We’re excited to have you on board and will start sending your course access shortly. If you need anything else, just let us know!",
+        "at": "2026-07-01T04:23:08.810Z"
       }
     ],
     "chosenOption": {
-      "id": "team",
-      "name": "Team",
-      "price": 1299
+      "id": "starter",
+      "name": "Starter",
+      "price": 149
     },
-    "payment": null,
+    "payment": {
+      "status": "paid",
+      "method": "card",
+      "cardName": "erwe",
+      "last4": "2342",
+      "amount": 149,
+      "currency": "USD",
+      "receiptNo": "OP-D24E6674",
+      "paidAt": "2026-07-01T04:23:05.997Z"
+    },
     "source": "journey-demo",
-    "createdAt": "2026-07-01T03:59:49.657Z",
-    "updatedAt": "2026-07-01T04:01:42.720Z"
+    "createdAt": "2026-07-01T04:22:45.548Z",
+    "updatedAt": "2026-07-01T04:23:08.811Z"
   }
 ]

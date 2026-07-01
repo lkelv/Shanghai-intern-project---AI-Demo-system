@@ -3,15 +3,21 @@ import { ChatHeader } from '../components/ChatHeader'
 import { ChatPanel } from '../components/ChatPanel'
 import { botMessage, userMessage, type Message } from '../chat'
 import { sendChat } from '../api'
-import type { StageId } from '../journey'
+import { wantsPlans, type StageId } from '../journey'
 
 interface RetentionProps {
   sessionId: string
   messages: Message[]
   onAppend: (stage: StageId, ...msgs: Message[]) => void
+  onGoToConversion: () => void
 }
 
-export function Retention({ sessionId, messages, onAppend }: RetentionProps) {
+export function Retention({
+  sessionId,
+  messages,
+  onAppend,
+  onGoToConversion,
+}: RetentionProps) {
   const [typing, setTyping] = useState(false)
 
   async function nextDay() {
@@ -32,6 +38,15 @@ export function Retention({ sessionId, messages, onAppend }: RetentionProps) {
   }
 
   async function handleSend(text: string) {
+    // If the customer asks to see plans/pricing, take them straight to the
+    // Conversion screen (which lays the options out properly) instead of
+    // answering with a wall of text here.
+    if (wantsPlans(text)) {
+      onAppend('retention', userMessage(text))
+      onGoToConversion()
+      return
+    }
+
     const user = userMessage(text)
     const next = [...messages, user]
     onAppend('retention', user)

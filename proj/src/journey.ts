@@ -8,6 +8,15 @@ export interface StageDef {
   hint: string
 }
 
+// Rough intent check: does this message mean "show me what I can buy"? Used to
+// auto-advance the customer to the Conversion (plans) screen.
+const PLAN_INTENT_RE =
+  /\b(plans?|pricing|prices?|cost|costs?|how much|options?|packages?|tiers?|buy|purchase|checkout|enroll|enrol|sign up|subscribe)\b/i
+
+export function wantsPlans(text: string): boolean {
+  return PLAN_INTENT_RE.test(text)
+}
+
 export const STAGES: StageDef[] = [
   { id: 'acquisition', label: 'Acquisition', hint: 'First contact' },
   { id: 'retention', label: 'Retention', hint: 'Follow-up' },
