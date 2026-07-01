@@ -1,24 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
-import {
-  getBotReply,
-  greeting,
-  initialBotState,
-  nowTime,
-  type BotState,
-  type Message,
-} from './mockBot'
+import { makeGreeting, nowTime, type Message } from './chat'
 
 function makeId() {
   return Math.random().toString(36).slice(2)
 }
 
 function App() {
-  const [messages, setMessages] = useState<Message[]>([greeting])
-  const [botState, setBotState] = useState<BotState>(initialBotState)
+  const [messages, setMessages] = useState<Message[]>(() => [makeGreeting()])
   const [input, setInput] = useState('')
   const [typing, setTyping] = useState(false)
 
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  function resetChat() {
+    setMessages([makeGreeting()])
+    setInput('')
+    setTyping(false)
+  }
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -27,7 +25,7 @@ function App() {
     })
   }, [messages, typing])
 
-  function send() {
+  async function send() {
     const text = input.trim()
     if (!text || typing) return
 
@@ -37,23 +35,34 @@ function App() {
       text,
       time: nowTime(),
     }
-    setMessages((m) => [...m, userMsg])
+    const history = [...messages, userMsg]
+    setMessages(history)
     setInput('')
     setTyping(true)
 
-    // Stand-in for the backend round-trip. Swap getBotReply() for a fetch to
-    // the local /api/chat endpoint once the OpenRouter backend exists.
-    const { reply, state } = getBotReply(text, botState)
-    setBotState(state)
+    // Ask the local backend, which holds the OpenRouter key and system prompt.
+    let reply: string
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: history.map((m) => ({ role: m.role, content: m.text })),
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data?.error || 'Request failed')
+      reply = data.reply
+    } catch {
+      reply =
+        "Sorry — I couldn't reach the assistant just now. Please make sure the backend is running and try again."
+    }
 
-    const delay = 650 + Math.min(reply.length * 12, 900)
-    window.setTimeout(() => {
-      setMessages((m) => [
-        ...m,
-        { id: makeId(), role: 'bot', text: reply, time: nowTime() },
-      ])
-      setTyping(false)
-    }, delay)
+    setMessages((m) => [
+      ...m,
+      { id: makeId(), role: 'bot', text: reply, time: nowTime() },
+    ])
+    setTyping(false)
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -80,6 +89,27 @@ function App() {
               online · replies instantly
             </p>
           </div>
+          <button
+            type="button"
+            onClick={resetChat}
+            className="flex shrink-0 items-center gap-1.5 border border-wa-divider px-2.5 py-1.5 font-mono text-[11px] text-wa-muted transition-colors hover:border-wa-green hover:text-wa-text"
+          >
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+              <path d="M3 3v5h5" />
+            </svg>
+            Restart
+          </button>
         </header>
 
         {/* Messages */}
