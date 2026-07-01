@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { makeGreeting, type Message } from './chat'
 import { STAGES, type ChosenOption, type PaymentInfo, type RunState, type StageId } from './journey'
-import { StageIndicator } from './components/StageIndicator'
+import { DevPanel } from './components/DevPanel'
 import { Acquisition } from './screens/Acquisition'
 import { Retention } from './screens/Retention'
 import { Conversion } from './screens/Conversion'
@@ -86,48 +86,23 @@ function App() {
   const stage = STAGES[run.stageIndex]
 
   return (
-    <div className="flex min-h-full items-stretch justify-center bg-[#0a0f12] sm:items-center sm:py-8">
-      <div className="wa-rise flex h-[100svh] w-full flex-col overflow-hidden bg-wa-panel sm:h-[820px] sm:max-w-[460px] sm:border sm:border-wa-divider">
-        {/* Title row: app name + reset */}
-        <div className="flex items-center justify-between border-b border-wa-divider bg-wa-panel px-3 py-2">
-          <span className="font-mono text-[11px] tracking-tight text-wa-muted">
-            OnePromise · journey demo
-          </span>
-          <button
-            type="button"
-            onClick={reset}
-            title="Start a fresh run"
-            className="flex shrink-0 items-center gap-1.5 border border-wa-divider px-2.5 py-1 font-mono text-[11px] text-wa-muted transition-colors hover:border-wa-green hover:text-wa-text"
-          >
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
-              <path d="M3 3v5h5" />
-            </svg>
-            Reset
-          </button>
-        </div>
+    <div className="flex min-h-[100svh] flex-col bg-[#0a0f12] md:flex-row">
+      {/* Dev-only instrument — not part of the customer product */}
+      <DevPanel
+        sessionId={run.sessionId}
+        stageIndex={run.stageIndex}
+        completed={completed}
+        email={run.email}
+        need={run.need}
+        chosenOption={run.chosenOption}
+        payment={run.payment}
+        onJump={goToStage}
+        onReset={reset}
+      />
 
-        {/* Progress */}
-        <div className="border-b border-wa-divider bg-wa-panel">
-          <StageIndicator
-            currentIndex={run.stageIndex}
-            completed={completed}
-            onJump={goToStage}
-          />
-        </div>
-
-        {/* Active screen */}
-        <div className="flex min-h-0 flex-1 flex-col">
+      {/* The product: just the chat / options */}
+      <main className="flex flex-1 items-stretch justify-center md:items-center md:py-8">
+        <div className="wa-rise flex h-[100svh] w-full flex-col overflow-hidden bg-wa-panel md:h-[780px] md:max-w-[460px] md:border md:border-wa-divider">
           {stage.id === 'acquisition' && (
             <Acquisition
               sessionId={run.sessionId}
@@ -165,30 +140,7 @@ function App() {
             />
           )}
         </div>
-
-        {/* Stage nav footer */}
-        <div className="flex items-center justify-between border-t border-wa-divider bg-wa-header px-3 py-2">
-          <button
-            type="button"
-            onClick={() => goToStage(run.stageIndex - 1)}
-            disabled={run.stageIndex === 0}
-            className="px-2 py-1 font-mono text-[11px] text-wa-muted transition-colors hover:text-wa-text disabled:opacity-30"
-          >
-            ← Back
-          </button>
-          <span className="font-mono text-[11px] text-wa-muted">
-            {run.stageIndex + 1} / {STAGES.length} · {stage.label}
-          </span>
-          <button
-            type="button"
-            onClick={() => goToStage(run.stageIndex + 1)}
-            disabled={run.stageIndex === STAGES.length - 1}
-            className="px-2 py-1 font-mono text-[11px] font-semibold text-wa-green transition-opacity hover:opacity-80 disabled:opacity-30"
-          >
-            Next →
-          </button>
-        </div>
-      </div>
+      </main>
     </div>
   )
 }

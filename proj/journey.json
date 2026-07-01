@@ -1,166 +1,98 @@
 [
   {
-    "id": "5b8a3b2c-cbbe-4ca8-ac44-1ceb9e486ab7",
-    "email": "demo2@example.com",
+    "id": "5f259581-1d61-4962-ab81-7220b2f5e915",
+    "email": "demo3@example.com",
     "name": null,
-    "need": "The customer wants to know how to buy the AI course and what payment options are available.",
-    "stage": "retention",
+    "need": "learning about AI business strategy",
+    "stage": "conversion",
     "messages": [
       {
         "stage": "acquisition",
         "role": "user",
-        "text": "sdf",
-        "at": "2026-07-01T03:50:20.744Z"
+        "text": "Hello",
+        "at": "2026-07-01T03:59:49.654Z"
       },
       {
         "stage": "acquisition",
         "role": "assistant",
-        "text": "Looks like something slipped in there! 🚀 How can I help you with our OnePromise AI Training Course today?",
-        "at": "2026-07-01T03:50:20.744Z"
+        "text": "Hey! 👋 How can I help you explore our OnePromise AI Training Course? If you'd like to chat more in detail, just drop me your email and a quick note about what you're looking to learn, and our team will follow up.",
+        "at": "2026-07-01T03:59:49.654Z"
       },
       {
         "stage": "acquisition",
         "role": "user",
-        "text": "hello i would like to buy something",
-        "at": "2026-07-01T03:50:24.757Z"
+        "text": "can you connect me to the team",
+        "at": "2026-07-01T03:59:54.993Z"
       },
       {
         "stage": "acquisition",
         "role": "assistant",
-        "text": "Sounds great! 👏 Which course or material are you looking at? Could you share your email and a quick note on what you’d like to learn? That way our team can follow up.",
-        "at": "2026-07-01T03:50:24.757Z"
+        "text": "Sure thing! Can you share your email address and a quick line about what you’re hoping to learn or achieve with the course? Our team will reach out to you right away.",
+        "at": "2026-07-01T03:59:54.993Z"
       },
       {
         "stage": "acquisition",
         "role": "user",
-        "text": "demo2@example.com",
-        "at": "2026-07-01T03:50:35.520Z"
+        "text": "demo3@example.com",
+        "at": "2026-07-01T04:00:10.648Z"
       },
       {
         "stage": "acquisition",
         "role": "assistant",
-        "text": "Thanks, demo2@example.com! 👌 Could you tell me a bit about what you’re hoping to get out of the course (e.g., AI fundamentals, team training, specific projects)? That’ll help us guide you.",
-        "at": "2026-07-01T03:50:35.520Z"
+        "text": "Thanks! Could you give me a quick description of what you’re hoping to focus on or achieve with the course? That way our team can tailor the follow‑up.",
+        "at": "2026-07-01T04:00:10.648Z"
       },
       {
         "stage": "acquisition",
         "role": "user",
-        "text": "buying something",
-        "at": "2026-07-01T03:50:53.537Z"
+        "text": "to learn about business in AI",
+        "at": "2026-07-01T04:00:24.891Z"
       },
       {
         "stage": "acquisition",
         "role": "assistant",
-        "text": "Got it! 🔥 What do you want to learn or achieve with the course? A brief note will help our team find the best fit for you.",
-        "at": "2026-07-01T03:50:53.537Z"
+        "text": "Got it! Just to make sure our team can help you best—could you give a quick note on what specific aspect of “business in AI” you’re most interested in (e.g., strategy, marketing, product development, or startup scaling)? Then we’ll have the right people connect with you.",
+        "at": "2026-07-01T04:00:24.891Z"
       },
       {
         "stage": "acquisition",
         "role": "user",
-        "text": "undertading AI",
-        "at": "2026-07-01T03:51:03.502Z"
+        "text": "strategy",
+        "at": "2026-07-01T04:00:32.638Z"
       },
       {
         "stage": "acquisition",
         "role": "assistant",
-        "text": "Awesome—understanding AI is a great start! 🚀 Could you drop a quick note on what you’re hoping to learn (e.g., basics, advanced tools, team training)? That’ll help the team find the perfect match for you.",
-        "at": "2026-07-01T03:51:03.502Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "user",
-        "text": "basics",
-        "at": "2026-07-01T03:51:09.417Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "assistant",
-        "text": "Great! 👏 Could you share a quick note on the specific basics you’d like to cover (e.g., machine‑learning fundamentals, data science basics, AI in business)? I’ll forward that to our team so they can follow up.",
-        "at": "2026-07-01T03:51:09.417Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "user",
-        "text": "AI in business",
-        "at": "2026-07-01T03:51:19.629Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "assistant",
-        "text": "Nice choice—AI fundamentals for business! 👩‍💼 Could you jot a quick line on any particular focus (e.g., data strategy, automation, decision‑support)? I’ll pass that on so our team can get you set up.",
-        "at": "2026-07-01T03:51:19.629Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "user",
-        "text": "data strategy",
-        "at": "2026-07-01T03:51:31.583Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "assistant",
-        "text": "Thanks for the info! 👩‍💻 We’ll add *AI in Business Basics – Data Strategy* to your order notes. Could you share a brief line on what you’re hoping to achieve or any specific questions you’d like the course to address? That way our team can tailor the follow‑up.",
-        "at": "2026-07-01T03:51:31.583Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "user",
-        "text": "nope",
-        "at": "2026-07-01T03:51:41.721Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "assistant",
-        "text": "Got it! 🎉 We’ve logged your interest in the “AI in Business Basics – Data Strategy” course. Could you send over just one or two sentences on what you’d like to achieve (or any quick question you have) so our team can give you the best info?#",
-        "at": "2026-07-01T03:51:41.721Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "user",
-        "text": "understanidng AI",
-        "at": "2026-07-01T03:51:51.404Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "assistant",
-        "text": "Got it—focusing on *understanding AI*. 👋 Could you give us a quick sentence (or two) about what you’d like to achieve or any specific questions you have? That way our team can give you the right info.",
-        "at": "2026-07-01T03:51:51.404Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "user",
-        "text": "how does this work? what is the payment like?",
-        "at": "2026-07-01T03:52:05.531Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "assistant",
-        "text": "Great question! 😄 You’ll check out through our secure online portal—at checkout you can pay with a major credit card or choose a bank‑transfer option. The payment is processed instantly, and you’ll get a PDF receipt to confirm the order.\n\nIf you’d like to pick a specific course or discuss any special needs, just let me know a bit more about what you’re hoping to achieve and I’ll hand that over to the team for a quick follow‑up.",
-        "at": "2026-07-01T03:52:05.531Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "user",
-        "text": "ok",
-        "at": "2026-07-01T03:52:13.633Z"
-      },
-      {
-        "stage": "acquisition",
-        "role": "assistant",
-        "text": "Sounds great! I’ve noted your interest in the AI Basics course (Data Strategy). Our team will reach out shortly to walk you through the next steps. If there’s anything else you need, just let me know!",
-        "at": "2026-07-01T03:52:13.633Z"
+        "text": "Great—thanks for the details! OnePromise’s AI Training Course has a strong “AI Business Strategy” module, and our team will reach out shortly to dive deeper into how you can build and grow AI‑driven initiatives. If you have any quick questions in the meantime, just let me know!",
+        "at": "2026-07-01T04:00:32.638Z"
       },
       {
         "stage": "retention",
         "role": "assistant",
-        "text": "Hey there! I’m happy to walk you through how the course works: it’s split into Starter ($149), Professional ($499), and Team ($1,299) tiers. Each tier builds on the last—Start with fundamentals and 8 modules, then add advanced content, projects, live Q&As, and even team‑onboarding for the Team plan. You can secure your spot with a simple online payment (credit card or PayPal) right from the enrollment page. Let me know if you’d like a quick plug‑in or any other details!",
-        "at": "2026-07-01T03:52:23.143Z"
+        "text": "Hey there! 🚀 I hope you’re finding some time to dive into AI strategy thoughts. If you’d like a deeper playbook that blends strategy with real projects and mentor feedback, our **Professional** tier could be a great fit. No pressure—just let me know what you’re looking for, and I’ll gladly walk you through the next steps!",
+        "at": "2026-07-01T04:00:47.748Z"
+      },
+      {
+        "stage": "conversion",
+        "role": "assistant",
+        "text": "**Professional ($499)** – It adds the 12 advanced modules and real‑world projects that dive into AI strategy and business use‑cases. It gives you the depth you need beyond just fundamentals, with mentor feedback and live Q&A to keep you moving forward.",
+        "at": "2026-07-01T04:01:29.236Z"
+      },
+      {
+        "stage": "retention",
+        "role": "assistant",
+        "text": "Hey again! 😊 Just checking in—if you’re still exploring how AI can shape your business strategy, our **Professional** track gives hands‑on projects and mentor feedback, plus a solid foundation from the Starter module. No rush, but if it sounds right, I’m happy to help you get started!",
+        "at": "2026-07-01T04:01:42.719Z"
       }
     ],
-    "chosenOption": null,
+    "chosenOption": {
+      "id": "team",
+      "name": "Team",
+      "price": 1299
+    },
     "payment": null,
     "source": "journey-demo",
-    "createdAt": "2026-07-01T03:50:20.747Z",
-    "updatedAt": "2026-07-01T03:52:23.143Z"
+    "createdAt": "2026-07-01T03:59:49.657Z",
+    "updatedAt": "2026-07-01T04:01:42.720Z"
   }
 ]
