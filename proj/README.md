@@ -49,8 +49,36 @@ You can also run them separately with `npm run web` and `npm run server`.
    key, and calls OpenRouter.
 3. The model's reply is returned and rendered as a chat bubble.
 
+## Lead capture
+
+Whenever a conversation contains an email address, the backend captures a lead:
+
+1. After the reply is sent (so the chat stays snappy), the server makes a second,
+   JSON-only model call to extract `{ name, need }` from the transcript.
+2. The lead is saved to [leads.json](leads.json), keyed by email — later messages
+   in the same conversation **update** the existing record instead of duplicating
+   it.
+
+Each record looks like:
+
+```json
+{
+  "id": "uuid",
+  "email": "tom@northwind.co",
+  "name": "Tom",
+  "need": "Image bounding-box labeling for 50k product photos",
+  "source": "whatsapp-demo",
+  "messageCount": 2,
+  "createdAt": "2026-07-01T03:13:25.755Z",
+  "updatedAt": "2026-07-01T03:13:25.755Z"
+}
+```
+
+View all captured leads at http://localhost:8791/api/leads (or just open
+`leads.json`).
+
 ## Next step
 
-Lead persistence: when a message contains an email + a described need, save the
-lead as a record in a local `leads.json`. The backend in [server.js](server.js)
-is where that endpoint will live.
+Connecting to the real WhatsApp Business API: swap the browser frontend for a
+webhook that receives inbound WhatsApp messages and posts replies back through
+the WhatsApp Cloud API — the `/api/chat` + lead-capture logic stays the same.
