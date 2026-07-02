@@ -10,13 +10,10 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
-    // The backend writes journey.json into this folder; don't let that trigger
-    // a full-page reload that would wipe the run mid-journey.
+    // The standalone Node backend writes journey.json into this folder; don't
+    // let that trigger a full-page reload that would wipe the run mid-journey.
     watch: { ignored: ['**/journey.json'] },
-    proxy: {
-      // Forward API calls to the local backend so the OpenRouter key stays
-      // server-side and the browser talks to a same-origin /api path.
-      '/api': 'http://localhost:8791',
-    },
+    // No /api proxy: the Cloudflare plugin runs the Worker (server.worker.js) in
+    // dev and serves /api directly (using .dev.vars + a local KV).
   },
 })

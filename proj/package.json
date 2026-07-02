@@ -4,13 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -n web,api -c cyan,green \"vite\" \"npm:server\"",
-    "web": "vite",
+    "dev": "vite",
     "server": "node --env-file=.env server.js",
+    "dev:file": "concurrently -n web,api -c cyan,green \"vite\" \"npm:server\"",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "npm run build && wrangler dev",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy",
+    "cf:kv:create": "wrangler kv namespace create JOURNEY",
+    "cf:secret": "wrangler secret put OPEN_ROUTER_API_KEY"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.2",

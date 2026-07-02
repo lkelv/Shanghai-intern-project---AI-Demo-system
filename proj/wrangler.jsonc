@@ -2,13 +2,33 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "ai-demo-system",
   "compatibility_date": "2026-07-02",
+  "compatibility_flags": ["nodejs_compat"],
   "observability": {
     "enabled": true
   },
+
+  // Backend Worker entry: handles /api/*, and falls back to the frontend assets.
+  "main": "server.worker.js",
+
+  // Serves the built frontend (dist). `binding` lets the Worker call
+  // env.ASSETS.fetch(request) for everything that isn't an /api route.
   "assets": {
+    "binding": "ASSETS",
     "not_found_handling": "single-page-application"
   },
-  "compatibility_flags": [
-    "nodejs_compat"
+
+  // Non-secret vars. The API key is a SECRET (wrangler secret put), not here.
+  "vars": {
+    "OPENROUTER_MODEL": "openai/gpt-oss-20b"
+  },
+
+  // One record per customer session (replaces journey.json on disk).
+  // Create the namespace, then paste its id below:
+  //   npx wrangler kv namespace create JOURNEY
+  "kv_namespaces": [
+    {
+      "binding": "JOURNEY",
+      "id": "020fd9b022ab4f4782d870b24bd63690"
+    }
   ]
 }

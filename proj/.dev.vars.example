@@ -1,0 +1,6 @@
+# Local secrets for `wrangler dev` (Cloudflare's local Worker runner).
+# Copy to `.dev.vars` and fill in your key:  cp .dev.vars.example .dev.vars
+# The real .dev.vars is git-ignored. In production, secrets come from
+# `wrangler secret put`, NOT from this file.
+
+OPEN_ROUTER_API_KEY = "sk-or-v1-your-key-here"
