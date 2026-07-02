@@ -4,6 +4,7 @@ import {
   type PaymentInfo,
   type StageId,
 } from '../journey'
+import { useT } from '../i18n'
 
 interface DevPanelProps {
   sessionId: string
@@ -31,11 +32,12 @@ export function DevPanel({
   onJump,
   onReset,
 }: DevPanelProps) {
+  const { lang, setLang, t, tTier } = useT()
   return (
     <aside className="flex shrink-0 flex-col gap-5 border-wa-divider bg-[#0d1418] px-4 py-5 md:h-[100svh] md:w-64 md:overflow-y-auto md:border-r">
       <div className="flex items-center justify-between">
         <span className="font-mono text-[11px] tracking-tight text-wa-green">
-          ◆ dev panel
+          ◆ {t('dev.title')}
         </span>
         <button
           type="button"
@@ -57,14 +59,37 @@ export function DevPanel({
             <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
             <path d="M3 3v5h5" />
           </svg>
-          reset
+          {t('dev.reset')}
         </button>
       </div>
 
       <p className="font-mono text-[10px] leading-relaxed text-wa-muted">
-        not shown to the customer — jump between stages and watch the captured
-        record grow.
+        {t('dev.desc')}
       </p>
+
+      {/* Language toggle — translates the whole UI. */}
+      <div>
+        <p className="mb-1.5 font-mono text-[10px] text-wa-muted">
+          {t('dev.translate')}
+        </p>
+        <div className="flex border border-wa-divider">
+          {(['en', 'zh'] as const).map((l) => (
+            <button
+              key={l}
+              type="button"
+              onClick={() => setLang(l)}
+              className={[
+                'flex-1 py-1.5 text-[12px] font-semibold transition-colors',
+                lang === l
+                  ? 'bg-wa-green text-[#04221c]'
+                  : 'text-wa-muted hover:text-wa-text',
+              ].join(' ')}
+            >
+              {l === 'en' ? 'English' : '中文'}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Stage stepper */}
       <ol className="flex flex-col">
@@ -102,10 +127,10 @@ export function DevPanel({
                       isCurrent ? 'text-wa-text' : 'text-wa-muted',
                     ].join(' ')}
                   >
-                    {stage.label}
+                    {t(`stage.${stage.id}.label`)}
                   </span>
                   <span className="block font-mono text-[10px] text-wa-muted">
-                    {stage.hint}
+                    {t(`stage.${stage.id}.hint`)}
                   </span>
                 </span>
               </button>
@@ -117,23 +142,23 @@ export function DevPanel({
       {/* Live captured record */}
       <div className="border-t border-wa-divider pt-4">
         <p className="mb-2 font-mono text-[10px] text-wa-muted">
-          captured → journey.json
+          {t('dev.captured')}
         </p>
         <dl className="flex flex-col gap-2">
-          <DataRow label="session" value={sessionId.slice(0, 8)} mono />
-          <DataRow label="email" value={email} />
-          <DataRow label="need" value={need} />
+          <DataRow label={t('dev.session')} value={sessionId.slice(0, 8)} mono />
+          <DataRow label={t('dev.email')} value={email} />
+          <DataRow label={t('dev.need')} value={need} />
           <DataRow
-            label="plan"
+            label={t('dev.plan')}
             value={
               chosenOption
-                ? `${chosenOption.name} · $${chosenOption.price}`
+                ? `${tTier(chosenOption.id)?.name ?? chosenOption.name} · $${chosenOption.price}`
                 : null
             }
           />
           <DataRow
-            label="payment"
-            value={payment ? `PAID · ${payment.receiptNo}` : null}
+            label={t('dev.payment')}
+            value={payment ? `${t('dev.paid')} · ${payment.receiptNo}` : null}
             good={!!payment}
           />
         </dl>

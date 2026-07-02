@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { botMessage, type Message } from '../chat'
 import { sendChat, savePayment } from '../api'
 import type { ChosenOption, PaymentInfo, StageId } from '../journey'
+import { useT } from '../i18n'
 
 interface PaymentProps {
   sessionId: string
@@ -22,6 +23,7 @@ export function Payment({
   onAppend,
   onPaid,
 }: PaymentProps) {
+  const { t, lang, tTier } = useT()
   const [cardName, setCardName] = useState('')
   const [cardNumber, setCardNumber] = useState('')
   const [expiry, setExpiry] = useState('')
@@ -40,6 +42,7 @@ export function Payment({
           stage: 'payment',
           messages: [],
           nudge: true,
+          lang,
           context: chosenOption ? { option: chosenOption } : undefined,
         })
         onAppend('payment', botMessage(reply))
@@ -68,17 +71,19 @@ export function Payment({
   if (!chosenOption) {
     return (
       <div className="grid min-h-0 flex-1 place-items-center bg-neutral-100 px-6 text-center">
-        <p className="text-[14px] text-neutral-500">
-          No plan selected yet. Go back to the Conversion stage and choose one.
-        </p>
+        <p className="text-[14px] text-neutral-500">{t('pay.noPlan')}</p>
       </div>
     )
   }
 
+  const planName = tTier(chosenOption.id)?.name ?? chosenOption.name
+
   // ---- Receipt ----
   if (payment) {
     return (
-      <div className="min-h-0 flex-1 overflow-y-auto bg-neutral-100 px-5 py-6 text-neutral-900">
+      <div className="flex min-h-0 flex-1 flex-col bg-neutral-100 text-neutral-900">
+        <CheckoutHeader />
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6">
         <div className="mx-auto max-w-[380px] wa-pop">
           <div className="border border-neutral-300 bg-white">
             <div className="flex items-center gap-3 border-b border-neutral-200 bg-emerald-600 px-5 py-4 text-white">
@@ -86,28 +91,28 @@ export function Payment({
                 ✓
               </span>
               <div className="leading-tight">
-                <p className="font-semibold">Payment successful</p>
+                <p className="font-semibold">{t('receipt.success')}</p>
                 <p className="font-mono text-[11px] text-emerald-100">
                   {payment.receiptNo}
                 </p>
               </div>
             </div>
             <dl className="divide-y divide-neutral-200 px-5 text-[13px]">
-              <Row label="Item" value={`${chosenOption.name} — ${payment.currency} $${payment.amount}`} />
-              <Row label="Card" value={`${payment.cardName} · •••• ${payment.last4}`} />
-              <Row label="Email" value={email || '—'} />
+              <Row label={t('receipt.item')} value={`${planName} — ${payment.currency} $${payment.amount}`} />
+              <Row label={t('receipt.card')} value={`${payment.cardName} · •••• ${payment.last4}`} />
+              <Row label={t('receipt.email')} value={email || '—'} />
               <Row
-                label="Paid"
+                label={t('receipt.paid')}
                 value={new Date(payment.paidAt).toLocaleString()}
               />
-              <Row label="Status" value="PAID" strong />
+              <Row label={t('receipt.status')} value={t('receipt.paidValue')} strong />
             </dl>
           </div>
 
           {messages.length > 0 && (
             <div className="mt-4 border-l-2 border-emerald-500 bg-white px-4 py-3 text-[14px] text-neutral-800">
               <p className="mb-1 font-mono text-[10px] uppercase tracking-wide text-neutral-400">
-                assistant
+                {t('receipt.assistant')}
               </p>
               {messages.map((m) => (
                 <p key={m.id} className="whitespace-pre-wrap">
@@ -118,8 +123,9 @@ export function Payment({
           )}
 
           <p className="mt-4 text-center font-mono text-[11px] text-neutral-400">
-            demo · no real payment was taken · saved to journey.json
+            {t('receipt.demoNote')}
           </p>
+        </div>
         </div>
       </div>
     )
@@ -127,29 +133,31 @@ export function Payment({
 
   // ---- Checkout form ----
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto bg-neutral-100 px-5 py-6 text-neutral-900">
-      <div className="mx-auto max-w-[380px]">
-        <div className="flex items-center justify-between">
-          <h2 className="text-[18px] font-semibold">Checkout</h2>
-          <span className="font-mono text-[11px] text-neutral-400">
-            🔒 test mode
-          </span>
-        </div>
-
+    <div className="flex min-h-0 flex-1 flex-col bg-neutral-100 text-neutral-900">
+      <CheckoutHeader />
+      <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6">
+        <div className="mx-auto max-w-[380px]">
         {/* Order summary */}
-        <div className="mt-4 flex items-center justify-between border border-neutral-300 bg-white px-4 py-3">
+        <div className="flex items-center justify-between border border-neutral-300 bg-white px-4 py-3">
           <div>
-            <p className="text-[14px] font-medium">{chosenOption.name}</p>
-            <p className="text-[12px] text-neutral-500">OnePromise AI Course</p>
+            <p className="text-[14px] font-medium">{planName}</p>
+            <p className="text-[12px] text-neutral-500">{t('pay.course')}</p>
           </div>
           <span className="font-mono text-[18px] font-bold">
             ${chosenOption.price}
           </span>
         </div>
 
+        <div className="mt-5 flex items-center justify-between">
+          <span className="text-[12px] font-medium text-neutral-600">
+            {t('pay.cardDetails')}
+          </span>
+          <CardBrands />
+        </div>
+
         {/* Card form */}
-        <div className="mt-4 flex flex-col gap-3">
-          <Field label="Name on card">
+        <div className="mt-3 flex flex-col gap-3">
+          <Field label={t('pay.nameOnCard')}>
             <input
               value={cardName}
               onChange={(e) => setCardName(e.target.value)}
@@ -157,7 +165,7 @@ export function Payment({
               className="w-full border border-neutral-300 bg-white px-3 py-2.5 text-[14px] outline-none focus:border-neutral-900"
             />
           </Field>
-          <Field label="Card number">
+          <Field label={t('pay.cardNumber')}>
             <input
               value={cardNumber}
               onChange={(e) => setCardNumber(formatCard(e.target.value))}
@@ -167,7 +175,7 @@ export function Payment({
             />
           </Field>
           <div className="flex gap-3">
-            <Field label="Expiry">
+            <Field label={t('pay.expiry')}>
               <input
                 value={expiry}
                 onChange={(e) => setExpiry(formatExpiry(e.target.value))}
@@ -175,7 +183,7 @@ export function Payment({
                 className="w-full border border-neutral-300 bg-white px-3 py-2.5 font-mono text-[14px] outline-none focus:border-neutral-900"
               />
             </Field>
-            <Field label="CVC">
+            <Field label={t('pay.cvc')}>
               <input
                 value={cvc}
                 onChange={(e) => setCvc(e.target.value.replace(/\D/g, '').slice(0, 4))}
@@ -191,14 +199,61 @@ export function Payment({
           type="button"
           onClick={pay}
           disabled={!canPay}
-          className="mt-5 w-full bg-neutral-900 py-3 text-[15px] font-semibold text-white transition-opacity disabled:opacity-40"
+          className="mt-5 flex w-full items-center justify-center gap-2 bg-neutral-900 py-3 text-[15px] font-semibold text-white transition-opacity disabled:opacity-40"
         >
-          {paying ? 'Processing…' : `Pay $${chosenOption.price}`}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+            <rect x="4" y="11" width="16" height="10" rx="2" />
+            <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+          </svg>
+          {paying
+            ? t('pay.processing')
+            : t('pay.pay', { price: chosenOption.price })}
         </button>
         <p className="mt-3 text-center font-mono text-[11px] text-neutral-400">
-          No real money moves — this is a mock checkout.
+          {t('pay.noMoney')}
+        </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function CheckoutHeader() {
+  const { t } = useT()
+  return (
+    <header className="flex items-center justify-between border-b border-neutral-200 bg-white px-4 py-3">
+      <div className="flex items-center gap-2">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-neutral-900" aria-hidden="true">
+          <rect x="4" y="11" width="16" height="10" rx="2" />
+          <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+        </svg>
+        <p className="text-[15px] font-semibold text-neutral-900">
+          {t('pay.secure')}
         </p>
       </div>
+      <span className="font-mono text-[10px] uppercase tracking-wide text-neutral-400">
+        {t('pay.testMode')}
+      </span>
+    </header>
+  )
+}
+
+function CardBrands() {
+  const brands = [
+    { label: 'VISA', cls: 'text-[#1a1f71]' },
+    { label: 'MC', cls: 'text-[#eb001b]' },
+    { label: 'AMEX', cls: 'text-[#2e77bc]' },
+  ]
+  return (
+    <div className="flex items-center gap-1">
+      {brands.map((b) => (
+        <span
+          key={b.label}
+          className={`border border-neutral-200 bg-white px-1.5 py-0.5 font-mono text-[9px] font-bold ${b.cls}`}
+        >
+          {b.label}
+        </span>
+      ))}
     </div>
   )
 }

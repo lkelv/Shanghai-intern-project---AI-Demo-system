@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { makeGreeting, type Message } from './chat'
 import { STAGES, type ChosenOption, type PaymentInfo, type RunState, type StageId } from './journey'
 import { DevPanel } from './components/DevPanel'
+import { PhoneStatusBar } from './components/PhoneStatusBar'
+import { useT } from './i18n'
 import { Acquisition } from './screens/Acquisition'
 import { Retention } from './screens/Retention'
 import { Conversion } from './screens/Conversion'
@@ -9,18 +11,26 @@ import { Payment } from './screens/Payment'
 
 const STORAGE_KEY = 'op_run_v2'
 
+// Which phone-chrome tint each stage's "app" uses.
+const STATUS_VARIANT: Record<StageId, 'whatsapp' | 'store' | 'checkout'> = {
+  acquisition: 'whatsapp',
+  retention: 'whatsapp',
+  conversion: 'store',
+  payment: 'checkout',
+}
+
 function newSessionId(): string {
   return typeof crypto !== 'undefined' && crypto.randomUUID
     ? crypto.randomUUID()
     : `sess-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`
 }
 
-function freshRun(): RunState {
+function freshRun(lang: 'en' | 'zh'): RunState {
   return {
     sessionId: newSessionId(),
     stageIndex: 0,
     messages: {
-      acquisition: [makeGreeting()],
+      acquisition: [makeGreeting(lang)],
       retention: [],
       conversion: [],
       payment: [],
@@ -32,7 +42,7 @@ function freshRun(): RunState {
   }
 }
 
-function loadRun(): RunState {
+function loadRun(lang: 'en' | 'zh'): RunState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) {
@@ -42,11 +52,12 @@ function loadRun(): RunState {
   } catch {
     /* fall through to a fresh run */
   }
-  return freshRun()
+  return freshRun(lang)
 }
 
 function App() {
-  const [run, setRun] = useState<RunState>(loadRun)
+  const { lang } = useT()
+  const [run, setRun] = useState<RunState>(() => loadRun(lang))
 
   useEffect(() => {
     try {
@@ -55,6 +66,21 @@ function App() {
       /* storage full / unavailable — non-fatal for the demo */
     }
   }, [run])
+
+  // If the language changes while the chat is still just the greeting, swap the
+  // greeting to the new language (existing conversation is left as-is).
+  useEffect(() => {
+    setRun((r) => {
+      const acq = r.messages.acquisition
+      if (acq.length === 1 && acq[0].id === 'greeting') {
+        return {
+          ...r,
+          messages: { ...r.messages, acquisition: [makeGreeting(lang)] },
+        }
+      }
+      return r
+    })
+  }, [lang])
 
   function update(partial: Partial<RunState>) {
     setRun((r) => ({ ...r, ...partial }))
@@ -72,8 +98,7 @@ function App() {
   }
 
   function reset() {
-    const fresh = freshRun()
-    setRun(fresh)
+    setRun(freshRun(lang))
   }
 
   const completed: Record<StageId, boolean> = {
@@ -103,13 +128,17 @@ function App() {
       {/* The product: just the chat / options */}
       <main className="flex flex-1 items-stretch justify-center md:items-center md:py-8">
         <div className="wa-rise flex h-[100svh] w-full flex-col overflow-hidden bg-wa-panel md:h-[780px] md:max-w-[460px] md:border md:border-wa-divider">
+          <PhoneStatusBar variant={STATUS_VARIANT[stage.id]} />
+
           {stage.id === 'acquisition' && (
             <Acquisition
               sessionId={run.sessionId}
               messages={run.messages.acquisition}
+              emailCaptured={run.email != null}
               onAppend={appendMessage}
               onEmail={(email) => update({ email })}
-              onGoToConversion={() => goToStage(2)}
+              onAdvance={() => goToStage(1)}
+              onSkipToPlans={() => goToStage(2)}
             />
           )}
           {stage.id === 'retention' && (
@@ -117,7 +146,7 @@ function App() {
               sessionId={run.sessionId}
               messages={run.messages.retention}
               onAppend={appendMessage}
-              onGoToConversion={() => goToStage(2)}
+              onAdvance={() => goToStage(2)}
             />
           )}
           {stage.id === 'conversion' && (

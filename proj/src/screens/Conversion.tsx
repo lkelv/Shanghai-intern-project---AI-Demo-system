@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { botMessage, userMessage, type Message } from '../chat'
 import { sendChat, saveOrder } from '../api'
 import type { ChosenOption, Catalog, StageId } from '../journey'
+import { useT } from '../i18n'
 import catalogData from '../../products.json'
 
 const catalog = catalogData as Catalog
@@ -16,6 +17,8 @@ interface ConversionProps {
   onContinue: () => void
 }
 
+// Conversion is styled as a storefront / pricing page — a different "app" from
+// the WhatsApp chat, with a small AI shopping assistant plugged in.
 export function Conversion({
   sessionId,
   messages,
@@ -25,13 +28,13 @@ export function Conversion({
   onChoose,
   onContinue,
 }: ConversionProps) {
+  const { t, lang, tTier } = useT()
   const [typing, setTyping] = useState(false)
   const [saving, setSaving] = useState<string | null>(null)
   const requested = useRef(false)
 
-  // When the screen first opens, ask the AI to present the options and
-  // recommend one — using the earlier conversation as context so it always
-  // has something concrete to work from.
+  // On open, have the assistant present the options and recommend one, using
+  // the earlier conversation as context so it always has something concrete.
   useEffect(() => {
     if (requested.current || messages.length > 0) return
     requested.current = true
@@ -43,6 +46,7 @@ export function Conversion({
           stage: 'conversion',
           messages: priorMessages,
           nudge: true,
+          lang,
         })
         onAppend('conversion', botMessage(reply))
       } catch {
@@ -63,7 +67,12 @@ export function Conversion({
     setTyping(true)
     let reply: string
     try {
-      reply = await sendChat({ sessionId, stage: 'conversion', messages: next })
+      reply = await sendChat({
+        sessionId,
+        stage: 'conversion',
+        messages: next,
+        lang,
+      })
     } catch {
       reply = "Couldn't reach the assistant. Is the backend running?"
     }
@@ -83,146 +92,171 @@ export function Conversion({
   }
 
   return (
-    <>
-      <header className="flex items-center justify-between bg-wa-header px-4 py-3">
-        <div className="leading-tight">
-          <p className="font-semibold text-wa-text">Choose your plan</p>
-          <p className="font-mono text-[11px] text-wa-muted">{catalog.name}</p>
+    <div className="flex min-h-0 flex-1 flex-col bg-white text-neutral-900">
+      {/* Store app header */}
+      <header className="flex items-center justify-between border-b border-neutral-200 bg-white px-4 py-3">
+        <div className="flex items-center gap-2.5">
+          <span className="grid h-8 w-8 place-items-center bg-neutral-900 text-white">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+              <path d="M3 6h18M16 10a4 4 0 0 1-8 0" />
+            </svg>
+          </span>
+          <div className="leading-tight">
+            <p className="text-[15px] font-semibold">{t('store.name')}</p>
+            <p className="font-mono text-[10px] text-neutral-400">
+              store / ai-training-course
+            </p>
+          </div>
         </div>
-        <span className="font-mono text-[11px] text-wa-muted">
+        <span className="font-mono text-[11px] text-neutral-400">
           {catalog.currency}
         </span>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto bg-wa-bg px-3 py-4">
-        {/* AI recommendation + Q&A */}
-        <div>
-          <p className="mb-2 font-mono text-[11px] text-wa-muted">
-            assistant · recommendation
-          </p>
-          <ul className="flex flex-col gap-2">
-            {messages.map((m) => (
-              <li
-                key={m.id}
-                className={
-                  m.role === 'user' ? 'flex justify-end' : 'flex justify-start'
-                }
-              >
-                <div
-                  className={[
-                    'wa-pop max-w-[85%] px-3 py-2 text-[14px] leading-snug text-wa-text',
-                    m.role === 'user'
-                      ? 'rounded-lg rounded-tr-sm bg-wa-out'
-                      : 'rounded-lg rounded-tl-sm bg-wa-in',
-                  ].join(' ')}
-                >
-                  {m.text}
-                </div>
-              </li>
-            ))}
-            {typing && (
-              <li className="flex justify-start">
-                <div className="flex items-center gap-1 rounded-lg bg-wa-in px-4 py-3">
-                  <span className="wa-dot h-1.5 w-1.5 rounded-full bg-wa-muted" />
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5">
+        <h2 className="text-[21px] font-semibold tracking-tight">
+          {t('conv.title')}
+        </h2>
+        <p className="mt-0.5 text-[13px] text-neutral-500">
+          {t('conv.catalogName')}
+        </p>
+
+        {/* AI shopping-assistant recommendation */}
+        {(messages.length > 0 || typing) && (
+          <div className="mt-4 border border-emerald-200 bg-emerald-50 p-3.5">
+            <p className="mb-1.5 flex items-center gap-1.5 text-[12px] font-semibold text-emerald-700">
+              <span>★</span> {t('conv.recommended')}
+            </p>
+            <div className="flex flex-col gap-2">
+              {messages.map((m) =>
+                m.role === 'bot' ? (
+                  <p
+                    key={m.id}
+                    className="whitespace-pre-wrap text-[13.5px] leading-snug text-neutral-800"
+                  >
+                    {m.text}
+                  </p>
+                ) : (
+                  <p
+                    key={m.id}
+                    className="self-end bg-neutral-900 px-2.5 py-1 text-[12.5px] text-white"
+                  >
+                    {m.text}
+                  </p>
+                ),
+              )}
+              {typing && (
+                <span className="flex items-center gap-1">
+                  <span className="wa-dot h-1.5 w-1.5 rounded-full bg-emerald-500" />
                   <span
-                    className="wa-dot h-1.5 w-1.5 rounded-full bg-wa-muted"
+                    className="wa-dot h-1.5 w-1.5 rounded-full bg-emerald-500"
                     style={{ animationDelay: '0.2s' }}
                   />
                   <span
-                    className="wa-dot h-1.5 w-1.5 rounded-full bg-wa-muted"
+                    className="wa-dot h-1.5 w-1.5 rounded-full bg-emerald-500"
                     style={{ animationDelay: '0.4s' }}
                   />
-                </div>
-              </li>
-            )}
-          </ul>
-        </div>
+                </span>
+              )}
+            </div>
+          </div>
+        )}
 
-        {/* Options — always shown, presented after the assistant's message */}
-        <div className="mt-5 border-t border-wa-divider pt-4">
-          <p className="mb-3 font-mono text-[11px] text-wa-muted">
-            choose a plan
-          </p>
-          <ul className="flex flex-col gap-3">
-            {catalog.tiers.map((tier) => {
-              const selected = chosenOption?.id === tier.id
-              return (
-                <li
-                  key={tier.id}
+        {/* Pricing cards */}
+        <ul className="mt-5 flex flex-col gap-3">
+          {catalog.tiers.map((tier) => {
+            const selected = chosenOption?.id === tier.id
+            const tt = tTier(tier.id)
+            const name = tt?.name ?? tier.name
+            const blurb = tt?.blurb ?? tier.blurb
+            const features = tt?.features ?? tier.features
+            return (
+              <li
+                key={tier.id}
+                className={[
+                  'relative border bg-white p-4 transition-colors',
+                  selected
+                    ? 'border-emerald-500 ring-1 ring-emerald-500'
+                    : tier.popular
+                      ? 'border-neutral-900'
+                      : 'border-neutral-200 hover:border-neutral-400',
+                ].join(' ')}
+              >
+                {tier.popular && (
+                  <span className="absolute -top-2.5 left-4 bg-neutral-900 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                    {t('conv.mostPopular')}
+                  </span>
+                )}
+                <div className="flex items-baseline justify-between gap-3">
+                  <h3 className="text-[17px] font-semibold">{name}</h3>
+                  <span className="font-mono text-[20px] font-bold">
+                    ${tier.price}
+                  </span>
+                </div>
+                <p className="mt-1 text-[13px] text-neutral-500">{blurb}</p>
+                <ul className="mt-3 flex flex-col gap-1.5">
+                  {features.map((f) => (
+                    <li key={f} className="flex gap-2 text-[13px] text-neutral-700">
+                      <span className="text-emerald-600">✓</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  type="button"
+                  onClick={() => choose(tier.id)}
+                  disabled={saving === tier.id}
                   className={[
-                    'border bg-wa-panel p-4 transition-colors',
+                    'mt-4 w-full py-2.5 text-[13px] font-semibold transition-colors',
                     selected
-                      ? 'border-wa-green'
-                      : 'border-wa-divider hover:border-wa-muted',
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-neutral-900 text-white hover:bg-neutral-700',
                   ].join(' ')}
                 >
-                  <div className="flex items-baseline justify-between gap-3">
-                    <h3 className="text-[16px] font-semibold text-wa-text">
-                      {tier.name}
-                    </h3>
-                    <span className="font-mono text-[18px] font-bold text-wa-text">
-                      ${tier.price}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-[13px] text-wa-muted">{tier.blurb}</p>
-                  <ul className="mt-3 flex flex-col gap-1">
-                    {tier.features.map((f) => (
-                      <li key={f} className="flex gap-2 text-[13px] text-wa-text">
-                        <span className="text-wa-green">✓</span>
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <button
-                    type="button"
-                    onClick={() => choose(tier.id)}
-                    disabled={saving === tier.id}
-                    className={[
-                      'mt-4 w-full py-2 text-[13px] font-semibold transition-colors',
-                      selected
-                        ? 'bg-wa-green text-[#04221c]'
-                        : 'border border-wa-green text-wa-green hover:bg-wa-green/10',
-                    ].join(' ')}
-                  >
-                    {selected
-                      ? '✓ Selected'
-                      : saving === tier.id
-                        ? 'Saving…'
-                        : `Choose ${tier.name}`}
-                  </button>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
+                  {selected
+                    ? t('conv.selected')
+                    : saving === tier.id
+                      ? t('conv.adding')
+                      : t('conv.choose', { name })}
+                </button>
+              </li>
+            )
+          })}
+        </ul>
       </div>
 
-      {/* Continue bar */}
+      {/* Continue to checkout */}
       {chosenOption && (
         <button
           type="button"
           onClick={onContinue}
-          className="wa-pop flex items-center justify-between bg-wa-green px-4 py-3 text-[14px] font-semibold text-[#04221c]"
+          className="wa-pop flex items-center justify-between bg-emerald-600 px-4 py-3.5 text-[14px] font-semibold text-white"
         >
           <span>
-            Continue to payment · {chosenOption.name} ${chosenOption.price}
+            {t('conv.checkout', {
+              name: tTier(chosenOption.id)?.name ?? chosenOption.name,
+              price: chosenOption.price,
+            })}
           </span>
           <span>→</span>
         </button>
       )}
 
-      {/* Question composer */}
-      <Composer onSend={handleSend} disabled={typing} />
-    </>
+      {/* Assistant question box (store help widget) */}
+      <Composer onSend={handleSend} disabled={typing} placeholder={t('conv.askPlaceholder')} />
+    </div>
   )
 }
 
 function Composer({
   onSend,
   disabled,
+  placeholder,
 }: {
   onSend: (text: string) => void
   disabled: boolean
+  placeholder: string
 }) {
   const [input, setInput] = useState('')
   function send() {
@@ -232,7 +266,7 @@ function Composer({
     setInput('')
   }
   return (
-    <div className="flex items-center gap-2 bg-wa-header px-3 py-3">
+    <div className="flex items-center gap-2 border-t border-neutral-200 bg-neutral-50 px-3 py-2.5">
       <input
         value={input}
         onChange={(e) => setInput(e.target.value)}
@@ -242,18 +276,18 @@ function Composer({
             send()
           }
         }}
-        placeholder="Ask about the plans…"
+        placeholder={placeholder}
         disabled={disabled}
-        className="flex-1 rounded-lg bg-wa-panel px-4 py-2.5 text-[15px] text-wa-text placeholder:text-wa-muted focus:outline-none disabled:opacity-50"
+        className="flex-1 border border-neutral-300 bg-white px-3 py-2 text-[14px] text-neutral-900 outline-none placeholder:text-neutral-400 focus:border-neutral-900 disabled:opacity-50"
       />
       <button
         type="button"
         onClick={send}
         disabled={!input.trim() || disabled}
         aria-label="Send message"
-        className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-wa-green text-[#04221c] transition-opacity disabled:opacity-40"
+        className="grid h-10 w-10 shrink-0 place-items-center bg-neutral-900 text-white transition-opacity disabled:opacity-40"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
           <path d="M3 20.5v-6l9-2.5-9-2.5v-6l18 8.5-18 8.5z" />
         </svg>
       </button>

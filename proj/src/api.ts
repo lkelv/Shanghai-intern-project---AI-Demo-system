@@ -15,6 +15,9 @@ interface ChatArgs {
   messages: Message[]
   nudge?: boolean
   context?: { option?: ChosenOption }
+  // UI language — used as the fallback reply language (e.g. for AI-initiated
+  // messages that have no customer text to match against).
+  lang?: 'en' | 'zh'
 }
 
 // One API for every screen. Returns the assistant's reply text.
@@ -24,6 +27,7 @@ export async function sendChat({
   messages,
   nudge = false,
   context,
+  lang = 'en',
 }: ChatArgs): Promise<string> {
   const res = await fetch('/api/chat', {
     method: 'POST',
@@ -33,6 +37,7 @@ export async function sendChat({
       stage,
       nudge,
       context,
+      lang,
       messages: toWire(messages),
     }),
   })

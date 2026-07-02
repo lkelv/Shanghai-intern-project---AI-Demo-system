@@ -9,6 +9,9 @@ interface ChatPanelProps {
   placeholder?: string
   disabled?: boolean
   emptyState?: ReactNode
+  // Optional bar shown between the messages and the composer (e.g. a
+  // "continue to the next stage" call to action).
+  banner?: ReactNode
 }
 
 export function ChatPanel({
@@ -18,6 +21,7 @@ export function ChatPanel({
   placeholder = 'Type a message',
   disabled = false,
   emptyState,
+  banner,
 }: ChatPanelProps) {
   const [input, setInput] = useState('')
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -92,6 +96,8 @@ export function ChatPanel({
           )}
         </ul>
       </div>
+
+      {banner}
 
       {onSend && (
         <div className="flex items-center gap-2 bg-wa-header px-3 py-3">
