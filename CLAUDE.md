@@ -18,26 +18,56 @@ The app lives in **`proj/`**. The git repo root is one level up.
 ## Stack
 
 - **Frontend**: React 19 + TypeScript + Vite 8 + Tailwind v4 (in `proj/src`).
-- **Backend**: a tiny **zero-dependency** Node HTTP server, `proj/server.js`
-  (uses Node's built-in `fetch` and `--env-file`; Node 25). It holds the
-  OpenRouter API key so the key never reaches the browser.
+- **Backend — TWO forms of the SAME logic** (keep both in sync):
+  - `proj/server.js` — tiny zero-dep Node HTTP server (Node's built-in `fetch` +
+    `--env-file`). Writes the data to `proj/journey.json` on disk. Used for the
+    **local file-based demo** (`npm run server`, port 8791).
+  - `proj/server.worker.js` — the **Cloudflare Worker** version. Same prompts +
+    endpoints, but stores data in **Cloudflare KV** (binding `JOURNEY`) and
+    serves the built frontend via `env.ASSETS`. This is the **hosted** form.
 - **Model**: `openai/gpt-oss-20b` via [OpenRouter](https://openrouter.ai).
-- `concurrently` runs web + api together.
+- Frontend is set up to deploy as a Cloudflare Worker (Workers + Static Assets)
+  via `@cloudflare/vite-plugin` + `proj/wrangler.jsonc`.
 
 ## Run it
 
 ```bash
 cd proj
 npm install
-npm run dev      # runs BOTH: web (Vite) on :5173  +  api (Node) on :8791
+npm run dev      # Vite + the Worker (server.worker.js) together on :5173
 ```
 
-- `npm run web` / `npm run server` run them separately.
-- `npm run build` = `tsc -b && vite build` (typecheck + build). Keep this green.
-- API key is in `proj/.env` as `OPEN_ROUTER_API_KEY = sk-or-...` (git-ignored;
-  the code trims whitespace around the value). Optional env: `OPENROUTER_MODEL`,
-  `API_PORT` (default 8791).
+- `npm run dev` runs the **Cloudflare-native** dev: the `@cloudflare/vite-plugin`
+  runs `server.worker.js` in-process, so `/api/*` is served by the Worker
+  (same-origin, no proxy) using a **local KV** and secrets from `.env`/`.dev.vars`.
+- `npm run server` — the standalone **file-based** Node backend (writes
+  `journey.json`); `npm run dev:file` runs Vite + that Node server together.
+- `npm run build` = `tsc -b && vite build` (typecheck + bundle worker + client).
+  Keep this green.
+- API key is in `proj/.env` as `OPEN_ROUTER_API_KEY = sk-or-...` (git-ignored).
+  The Vite/CF plugin reads it automatically for dev. Optional: `OPENROUTER_MODEL`,
+  `API_PORT` (Node server only; default 8791).
 - Open http://localhost:5173.
+
+## Deploying to Cloudflare (hosted backend + frontend, one Worker)
+
+One Worker (`ai-demo-system`) serves the frontend assets AND `/api/*`. Config in
+`proj/wrangler.jsonc` (`main: server.worker.js`, `assets.binding: ASSETS`,
+`kv_namespaces` → `JOURNEY`, `vars.OPENROUTER_MODEL`).
+
+```bash
+cd proj
+npm run cf:kv:create     # wrangler kv namespace create JOURNEY -> paste id into wrangler.jsonc
+npm run cf:secret        # wrangler secret put OPEN_ROUTER_API_KEY (prod secret)
+npm run deploy           # build + wrangler deploy
+```
+
+Needs a (free) Cloudflare account + `wrangler login` first. The **KV namespace
+id** in `wrangler.jsonc` is a placeholder (`PASTE_YOUR_KV_NAMESPACE_ID_HERE`) — it
+MUST be replaced with the real id before deploy. There's no `journey.json` file
+when hosted; inspect leads via `GET /api/journey` or `wrangler kv key list/get`.
+Local Worker secrets for `wrangler dev` go in `proj/.dev.vars` (git-ignored;
+template in `.dev.vars.example`).
 
 ## Architecture / data model
 
@@ -118,11 +148,14 @@ layout at `md` (≥768px); stacks below that.
 
 ```
 proj/
-  server.js                    backend: prompts, endpoints, lead extraction, journey.json, lang rule
-  products.json                catalog (shared FE+BE); has "popular" flag
-  journey.json                 the data store (array; currently reset to [])
-  vite.config.ts               port 5173 strictPort; proxy /api → :8791; watch.ignored: journey.json
-  .env                         OPEN_ROUTER_API_KEY (git-ignored)
+  server.js                    LOCAL backend (Node): prompts, endpoints, lead extraction, journey.json
+  server.worker.js             CLOUDFLARE Worker backend: same logic, KV storage + ASSETS fallback
+  wrangler.jsonc               CF config: main=server.worker.js, ASSETS binding, KV JOURNEY, vars
+  .dev.vars.example            template for `wrangler dev` local secrets (copy to .dev.vars)
+  products.json                catalog (shared FE+BE+worker); has "popular" flag
+  journey.json                 local data store (array; only written by server.js)
+  vite.config.ts               port 5173 strictPort; cloudflare() plugin; watch.ignored: journey.json
+  .env / .env.example          OPEN_ROUTER_API_KEY (.env git-ignored)
   src/
     App.tsx                    orchestrator: run state, localStorage, stage routing, status bar, greeting-swap
     journey.ts                 STAGES, wantsPlans(), types (ProductTier/Catalog/ChosenOption/PaymentInfo/RunState)
@@ -137,9 +170,13 @@ proj/
 
 ## Gotchas / operational notes
 
-- **Backend has no `--watch`** → after editing `server.js` (e.g. prompts) you
-  MUST restart it (restart `npm run dev`, or the preview) to pick up changes.
-  Vite auto-restarts on `vite.config.ts` changes; `src/` is HMR.
+- **Two backends, same logic — keep them in sync.** Prompts/endpoints live in
+  BOTH `server.js` (Node/file) and `server.worker.js` (Worker/KV). If you edit a
+  prompt or endpoint, edit both. `npm run dev` now runs the **Worker** (via the
+  Vite CF plugin), NOT the Node server. `npm run server` / `dev:file` run the
+  Node file-based one.
+- **`server.js` has no `--watch`** → restart it after edits. The Worker under
+  `npm run dev` hot-reloads with Vite. `src/` is HMR.
 - **`journey.json` is in `vite.config.ts` `watch.ignored`** — the backend writes
   it inside `proj/`, and without this Vite would full-reload and wipe the run.
   The run also survives reloads via `localStorage`.
@@ -157,9 +194,13 @@ proj/
 - **Done**: all 4 stages with AI per stage; journey.json capture; app-per-stage
   restyle; forward walk through retention with buy-intent express lane; bilingual
   UI toggle (incl. dev panel) + AI language matching. `npm run build` passes.
-- **Uncommitted**: several `proj/src/*` files modified and `src/i18n.tsx`
-  untracked (git branch `user-flow-v2-clear`; main branch is `main`). Nothing has
-  been committed by request — commit only if the user asks.
+- **Cloudflare**: integrated single Worker (assets + `/api`) via KV. `npm run
+  build` + a local `npm run dev` (worker on :5173, `/api/health` OK) both
+  verified. NOT yet deployed — needs the user's CF account, a real KV namespace
+  id in `wrangler.jsonc`, and the secret set.
+- **Uncommitted**: current git branch is `backend-prep-v2` (main branch is
+  `main`). Many `proj/` files are new/modified and uncommitted. Nothing has been
+  committed by request — commit only if the user asks.
 - **Known minor**: on Conversion, the AI recommendation can occasionally fire
   just before the server finishes extracting `need`, so it may ask a clarifying
   question instead of naming a tier; it recovers. Could pass `need` into the
