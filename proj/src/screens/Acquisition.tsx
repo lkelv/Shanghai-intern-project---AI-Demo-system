@@ -5,6 +5,7 @@ import { botMessage, userMessage, type Message } from '../chat'
 import { sendChat } from '../api'
 import { wantsPlans, type StageId } from '../journey'
 import { AdvanceBar } from '../components/AdvanceBar'
+import { useT } from '../i18n'
 
 const EMAIL_RE = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i
 
@@ -29,6 +30,7 @@ export function Acquisition({
   onAdvance,
   onSkipToPlans,
 }: AcquisitionProps) {
+  const { t, lang } = useT()
   const [typing, setTyping] = useState(false)
 
   async function handleSend(text: string) {
@@ -44,9 +46,12 @@ export function Acquisition({
     if (wantsPlans(text)) {
       onAppend('acquisition', user)
       if (email) {
-        sendChat({ sessionId, stage: 'acquisition', messages: next }).catch(
-          () => {},
-        )
+        sendChat({
+          sessionId,
+          stage: 'acquisition',
+          messages: next,
+          lang,
+        }).catch(() => {})
       }
       onSkipToPlans()
       return
@@ -57,7 +62,12 @@ export function Acquisition({
 
     let reply: string
     try {
-      reply = await sendChat({ sessionId, stage: 'acquisition', messages: next })
+      reply = await sendChat({
+        sessionId,
+        stage: 'acquisition',
+        messages: next,
+        lang,
+      })
     } catch {
       reply =
         "Sorry — I couldn't reach the assistant just now. Make sure the backend is running and try again."
@@ -68,18 +78,15 @@ export function Acquisition({
 
   return (
     <>
-      <ChatHeader
-        title="OnePromise Assistant"
-        subtitle="online · replies instantly"
-      />
+      <ChatHeader title={t('acq.title')} subtitle={t('acq.subtitle')} />
       <ChatPanel
         messages={messages}
         typing={typing}
         onSend={handleSend}
-        placeholder="Type a message"
+        placeholder={t('composer.type')}
         banner={
           emailCaptured && !typing ? (
-            <AdvanceBar label="Continue to follow-up" onClick={onAdvance} />
+            <AdvanceBar label={t('acq.continue')} onClick={onAdvance} />
           ) : null
         }
       />

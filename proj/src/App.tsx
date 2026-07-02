@@ -3,6 +3,7 @@ import { makeGreeting, type Message } from './chat'
 import { STAGES, type ChosenOption, type PaymentInfo, type RunState, type StageId } from './journey'
 import { DevPanel } from './components/DevPanel'
 import { PhoneStatusBar } from './components/PhoneStatusBar'
+import { useT } from './i18n'
 import { Acquisition } from './screens/Acquisition'
 import { Retention } from './screens/Retention'
 import { Conversion } from './screens/Conversion'
@@ -24,12 +25,12 @@ function newSessionId(): string {
     : `sess-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`
 }
 
-function freshRun(): RunState {
+function freshRun(lang: 'en' | 'zh'): RunState {
   return {
     sessionId: newSessionId(),
     stageIndex: 0,
     messages: {
-      acquisition: [makeGreeting()],
+      acquisition: [makeGreeting(lang)],
       retention: [],
       conversion: [],
       payment: [],
@@ -41,7 +42,7 @@ function freshRun(): RunState {
   }
 }
 
-function loadRun(): RunState {
+function loadRun(lang: 'en' | 'zh'): RunState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) {
@@ -51,11 +52,12 @@ function loadRun(): RunState {
   } catch {
     /* fall through to a fresh run */
   }
-  return freshRun()
+  return freshRun(lang)
 }
 
 function App() {
-  const [run, setRun] = useState<RunState>(loadRun)
+  const { lang } = useT()
+  const [run, setRun] = useState<RunState>(() => loadRun(lang))
 
   useEffect(() => {
     try {
@@ -64,6 +66,21 @@ function App() {
       /* storage full / unavailable — non-fatal for the demo */
     }
   }, [run])
+
+  // If the language changes while the chat is still just the greeting, swap the
+  // greeting to the new language (existing conversation is left as-is).
+  useEffect(() => {
+    setRun((r) => {
+      const acq = r.messages.acquisition
+      if (acq.length === 1 && acq[0].id === 'greeting') {
+        return {
+          ...r,
+          messages: { ...r.messages, acquisition: [makeGreeting(lang)] },
+        }
+      }
+      return r
+    })
+  }, [lang])
 
   function update(partial: Partial<RunState>) {
     setRun((r) => ({ ...r, ...partial }))
@@ -81,8 +98,7 @@ function App() {
   }
 
   function reset() {
-    const fresh = freshRun()
-    setRun(fresh)
+    setRun(freshRun(lang))
   }
 
   const completed: Record<StageId, boolean> = {

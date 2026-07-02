@@ -35,7 +35,18 @@ moves the customer one step along), so retention is always part of the path.
 
 A **dev panel** on the left (not part of the customer product) shows which stage
 the tester is on, lets them jump between stages, **Reset** for a fresh run, and
-watch the captured record grow.
+watch the captured record grow. It also has an **English / 中文** toggle that
+translates the customer-facing UI.
+
+## Bilingual
+
+- The dev panel's **English / 中文** toggle switches the whole UI (the
+  customer-facing screens and the dev panel itself) between English and
+  Simplified Chinese.
+- The **AI replies in whatever language the customer types** — write in Chinese
+  and it answers in Chinese, write in English and it answers in English —
+  independent of the UI toggle (the toggle only sets the fallback language for
+  AI-initiated messages like the retention follow-up).
 
 ## Setup
 

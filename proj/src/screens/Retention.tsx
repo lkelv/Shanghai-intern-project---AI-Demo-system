@@ -5,6 +5,7 @@ import { botMessage, userMessage, type Message } from '../chat'
 import { sendChat } from '../api'
 import { wantsPlans, type StageId } from '../journey'
 import { AdvanceBar } from '../components/AdvanceBar'
+import { useT } from '../i18n'
 
 interface RetentionProps {
   sessionId: string
@@ -19,6 +20,7 @@ export function Retention({
   onAppend,
   onAdvance,
 }: RetentionProps) {
+  const { t, lang } = useT()
   const [typing, setTyping] = useState(false)
   const followedUp = messages.some((m) => m.role === 'bot')
 
@@ -31,6 +33,7 @@ export function Retention({
         stage: 'retention',
         messages,
         nudge: true,
+        lang,
       })
     } catch {
       reply = "Couldn't reach the assistant. Is the backend running?"
@@ -55,7 +58,12 @@ export function Retention({
     setTyping(true)
     let reply: string
     try {
-      reply = await sendChat({ sessionId, stage: 'retention', messages: next })
+      reply = await sendChat({
+        sessionId,
+        stage: 'retention',
+        messages: next,
+        lang,
+      })
     } catch {
       reply = "Couldn't reach the assistant. Is the backend running?"
     }
@@ -65,12 +73,12 @@ export function Retention({
 
   return (
     <>
-      <ChatHeader title="OnePromise · Follow-up" subtitle="day 2 · re-engaging" />
+      <ChatHeader title={t('ret.title')} subtitle={t('ret.subtitle')} />
 
       {/* Trigger row — simulates time passing so the AI reaches back out. */}
       <div className="flex items-center justify-between gap-2 border-b border-wa-divider bg-wa-panel px-4 py-2.5">
         <span className="font-mono text-[11px] text-wa-muted">
-          simulate the passage of time
+          {t('ret.simulate')}
         </span>
         <button
           type="button"
@@ -78,7 +86,7 @@ export function Retention({
           disabled={typing}
           className="flex items-center gap-1.5 bg-wa-green px-3 py-1.5 text-[12px] font-semibold text-[#04221c] transition-opacity disabled:opacity-40"
         >
-          Next day ⏭
+          {t('ret.nextDay')} ⏭
         </button>
       </div>
 
@@ -86,18 +94,17 @@ export function Retention({
         messages={messages}
         typing={typing}
         onSend={handleSend}
-        placeholder="Reply to the follow-up…"
+        placeholder={t('ret.replyPlaceholder')}
         banner={
           followedUp && !typing ? (
-            <AdvanceBar label="See the plans" onClick={onAdvance} />
+            <AdvanceBar label={t('ret.seePlans')} onClick={onAdvance} />
           ) : null
         }
         emptyState={
           <div className="mx-auto mt-10 max-w-[80%] text-center">
-            <p className="text-[15px] text-wa-text">A day goes by…</p>
+            <p className="text-[15px] text-wa-text">{t('ret.emptyTitle')}</p>
             <p className="mt-1 text-[13px] text-wa-muted">
-              Hit <span className="font-semibold">Next day</span> to have the
-              assistant follow up and re-engage the customer.
+              {t('ret.emptyHint', { btn: t('ret.nextDay') })}
             </p>
           </div>
         }

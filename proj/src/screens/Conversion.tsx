@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { botMessage, userMessage, type Message } from '../chat'
 import { sendChat, saveOrder } from '../api'
 import type { ChosenOption, Catalog, StageId } from '../journey'
+import { useT } from '../i18n'
 import catalogData from '../../products.json'
 
 const catalog = catalogData as Catalog
@@ -27,6 +28,7 @@ export function Conversion({
   onChoose,
   onContinue,
 }: ConversionProps) {
+  const { t, lang, tTier } = useT()
   const [typing, setTyping] = useState(false)
   const [saving, setSaving] = useState<string | null>(null)
   const requested = useRef(false)
@@ -44,6 +46,7 @@ export function Conversion({
           stage: 'conversion',
           messages: priorMessages,
           nudge: true,
+          lang,
         })
         onAppend('conversion', botMessage(reply))
       } catch {
@@ -64,7 +67,12 @@ export function Conversion({
     setTyping(true)
     let reply: string
     try {
-      reply = await sendChat({ sessionId, stage: 'conversion', messages: next })
+      reply = await sendChat({
+        sessionId,
+        stage: 'conversion',
+        messages: next,
+        lang,
+      })
     } catch {
       reply = "Couldn't reach the assistant. Is the backend running?"
     }
@@ -95,7 +103,7 @@ export function Conversion({
             </svg>
           </span>
           <div className="leading-tight">
-            <p className="text-[15px] font-semibold">OnePromise Store</p>
+            <p className="text-[15px] font-semibold">{t('store.name')}</p>
             <p className="font-mono text-[10px] text-neutral-400">
               store / ai-training-course
             </p>
@@ -108,15 +116,17 @@ export function Conversion({
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5">
         <h2 className="text-[21px] font-semibold tracking-tight">
-          Choose your plan
+          {t('conv.title')}
         </h2>
-        <p className="mt-0.5 text-[13px] text-neutral-500">{catalog.name}</p>
+        <p className="mt-0.5 text-[13px] text-neutral-500">
+          {t('conv.catalogName')}
+        </p>
 
         {/* AI shopping-assistant recommendation */}
         {(messages.length > 0 || typing) && (
           <div className="mt-4 border border-emerald-200 bg-emerald-50 p-3.5">
             <p className="mb-1.5 flex items-center gap-1.5 text-[12px] font-semibold text-emerald-700">
-              <span>★</span> Recommended for you
+              <span>★</span> {t('conv.recommended')}
             </p>
             <div className="flex flex-col gap-2">
               {messages.map((m) =>
@@ -157,6 +167,10 @@ export function Conversion({
         <ul className="mt-5 flex flex-col gap-3">
           {catalog.tiers.map((tier) => {
             const selected = chosenOption?.id === tier.id
+            const tt = tTier(tier.id)
+            const name = tt?.name ?? tier.name
+            const blurb = tt?.blurb ?? tier.blurb
+            const features = tt?.features ?? tier.features
             return (
               <li
                 key={tier.id}
@@ -171,18 +185,18 @@ export function Conversion({
               >
                 {tier.popular && (
                   <span className="absolute -top-2.5 left-4 bg-neutral-900 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
-                    Most popular
+                    {t('conv.mostPopular')}
                   </span>
                 )}
                 <div className="flex items-baseline justify-between gap-3">
-                  <h3 className="text-[17px] font-semibold">{tier.name}</h3>
+                  <h3 className="text-[17px] font-semibold">{name}</h3>
                   <span className="font-mono text-[20px] font-bold">
                     ${tier.price}
                   </span>
                 </div>
-                <p className="mt-1 text-[13px] text-neutral-500">{tier.blurb}</p>
+                <p className="mt-1 text-[13px] text-neutral-500">{blurb}</p>
                 <ul className="mt-3 flex flex-col gap-1.5">
-                  {tier.features.map((f) => (
+                  {features.map((f) => (
                     <li key={f} className="flex gap-2 text-[13px] text-neutral-700">
                       <span className="text-emerald-600">✓</span>
                       {f}
@@ -201,10 +215,10 @@ export function Conversion({
                   ].join(' ')}
                 >
                   {selected
-                    ? '✓ Selected'
+                    ? t('conv.selected')
                     : saving === tier.id
-                      ? 'Adding…'
-                      : `Choose ${tier.name}`}
+                      ? t('conv.adding')
+                      : t('conv.choose', { name })}
                 </button>
               </li>
             )
@@ -220,14 +234,17 @@ export function Conversion({
           className="wa-pop flex items-center justify-between bg-emerald-600 px-4 py-3.5 text-[14px] font-semibold text-white"
         >
           <span>
-            Checkout · {chosenOption.name} ${chosenOption.price}
+            {t('conv.checkout', {
+              name: tTier(chosenOption.id)?.name ?? chosenOption.name,
+              price: chosenOption.price,
+            })}
           </span>
           <span>→</span>
         </button>
       )}
 
       {/* Assistant question box (store help widget) */}
-      <Composer onSend={handleSend} disabled={typing} />
+      <Composer onSend={handleSend} disabled={typing} placeholder={t('conv.askPlaceholder')} />
     </div>
   )
 }
@@ -235,9 +252,11 @@ export function Conversion({
 function Composer({
   onSend,
   disabled,
+  placeholder,
 }: {
   onSend: (text: string) => void
   disabled: boolean
+  placeholder: string
 }) {
   const [input, setInput] = useState('')
   function send() {
@@ -257,7 +276,7 @@ function Composer({
             send()
           }
         }}
-        placeholder="Ask the assistant about the plans…"
+        placeholder={placeholder}
         disabled={disabled}
         className="flex-1 border border-neutral-300 bg-white px-3 py-2 text-[14px] text-neutral-900 outline-none placeholder:text-neutral-400 focus:border-neutral-900 disabled:opacity-50"
       />

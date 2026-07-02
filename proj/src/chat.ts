@@ -24,10 +24,13 @@ export function userMessage(text: string): Message {
   return { id: makeId(), role: 'user', text, time: nowTime() }
 }
 
-const GREETING_TEXT =
-  "👋 Hi there! I'm the OnePromise assistant. Ask me anything about our AI Training Course, and I can connect you with our team."
+const GREETING_TEXT: Record<'en' | 'zh', string> = {
+  en: "👋 Hi there! I'm the OnePromise assistant. Ask me anything about our AI Training Course, and I can connect you with our team.",
+  zh: '👋 你好！我是 OnePromise 助手。关于我们的 AI 培训课程，欢迎随时咨询，我也可以帮你联系团队。',
+}
 
 // A fresh greeting for the acquisition screen — used on load and on restart.
-export function makeGreeting(): Message {
-  return botMessage(GREETING_TEXT)
+// Given a stable id so we can detect a still-untouched chat and swap languages.
+export function makeGreeting(lang: 'en' | 'zh' = 'en'): Message {
+  return { id: 'greeting', role: 'bot', text: GREETING_TEXT[lang], time: nowTime() }
 }

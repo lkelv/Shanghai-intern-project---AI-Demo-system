@@ -57,7 +57,7 @@ function catalogText() {
     .join('\n')
 }
 
-function buildSystemPrompt(stage, record, context) {
+function buildSystemPrompt(stage, record, context, lang) {
   let p = `${BASE_PROMPT}\n\n${STAGE_PROMPT[stage] || STAGE_PROMPT.acquisition}`
 
   if (record?.need) {
@@ -70,6 +70,11 @@ function buildSystemPrompt(stage, record, context) {
   if (option && (stage === 'conversion' || stage === 'payment')) {
     p += `\n\nThe customer has chosen the ${option.name} tier ($${option.price}).`
   }
+
+  // Language: always mirror the customer's most recent message; fall back to the
+  // UI language when there's no customer message to go on (AI-initiated turns).
+  const fallback = lang === 'zh' ? 'Simplified Chinese' : 'English'
+  p += `\n\nLanguage: reply in the SAME language the customer wrote their latest message in (if they write in Chinese, reply in Chinese; if in English, reply in English). If there is no customer message to judge from, reply in ${fallback}.`
   return p
 }
 
@@ -304,10 +309,11 @@ async function handleChat(req, res) {
 
   const stage = STAGES.includes(payload.stage) ? payload.stage : 'acquisition'
   const nudge = !!payload.nudge
+  const lang = payload.lang === 'zh' ? 'zh' : 'en'
   const cleaned = cleanMessages(payload.messages)
 
   const record = await getJourney(sessionId)
-  const system = buildSystemPrompt(stage, record, payload.context)
+  const system = buildSystemPrompt(stage, record, payload.context, lang)
   const llm = [{ role: 'system', content: system }, ...cleaned]
   if (nudge && NUDGE[stage]) llm.push({ role: 'user', content: NUDGE[stage] })
 
