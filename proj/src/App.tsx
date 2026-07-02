@@ -122,6 +122,7 @@ function App() {
               onAppend={appendMessage}
               onEmail={(email) => update({ email })}
               onAdvance={() => goToStage(1)}
+              onSkipToPlans={() => goToStage(2)}
             />
           )}
           {stage.id === 'retention' && (

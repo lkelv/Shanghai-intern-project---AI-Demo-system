@@ -1,28 +1,52 @@
 [
   {
-    "id": "15ec23ec-a79e-4954-9ea1-a8c1e72f994d",
-    "email": null,
+    "id": "1a30ff0b-71f3-47d8-b7f0-58632990b1da",
+    "email": "demo@demo.com",
     "name": null,
-    "need": null,
-    "stage": "conversion",
+    "need": "They are requesting to be connected to a human representative for assistance.",
+    "stage": "payment",
     "messages": [
       {
         "stage": "acquisition",
         "role": "user",
-        "text": "Hello",
-        "at": "2026-07-01T05:49:02.984Z"
+        "text": "can you connet me to a human",
+        "at": "2026-07-01T07:00:20.795Z"
       },
       {
         "stage": "acquisition",
         "role": "assistant",
-        "text": "Hey! How can I help you get started with OnePromise AI Training? If you give me your email and a quick note on what you’re looking to learn, I’ll pass it on to the team so they can reach out.",
-        "at": "2026-07-01T05:49:02.984Z"
+        "text": "Absolutely! If you send me your email and a quick note about what you need help with, I’ll pass it along to our support team so they can get back to you right away.",
+        "at": "2026-07-01T07:00:20.795Z"
+      },
+      {
+        "stage": "acquisition",
+        "role": "user",
+        "text": "demo@demo.com",
+        "at": "2026-07-01T07:00:32.350Z"
+      },
+      {
+        "stage": "acquisition",
+        "role": "assistant",
+        "text": "Thanks, demo@demo.com! Could you let me know what you’re hoping to learn or achieve with the OnePromise AI Training Course? Just a sentence or two will help our team reach out to you.",
+        "at": "2026-07-01T07:00:32.350Z"
       },
       {
         "stage": "retention",
         "role": "assistant",
-        "text": "Hi there! I just wanted to check in and see if you had a chance to think about how the OnePromise AI Training Course could help you build and apply AI skills. Whether you’re looking for the self‑paced Starter ($149) or the full Team package (up to 10 seats), you’ll find modules, hands‑on notebooks, projects, and live Q&A at every tier. Let me know if you have any questions or need help deciding which option fits you best!",
-        "at": "2026-07-01T05:49:22.705Z"
+        "text": "Hey there 👋—just wanted to say thanks again for checking out the OnePromise AI Training Course! If you’re still curious about the content, or need a quick chat with a team member, I’m happy to help set that up. Meanwhile, if you want to dive straight into the courses, the Starter tier gives you solid fundamentals in just a few days, and the Professional tier adds real projects and live Q&A. Let me know what works best for you! 🧠✨",
+        "at": "2026-07-01T07:00:54.361Z"
+      },
+      {
+        "stage": "conversion",
+        "role": "assistant",
+        "text": "Here are the options we have: Starter ($149) for self‑paced fundamentals, Professional ($499) adds advanced modules, projects and live Q&A, and Team ($1299) gives everything in Professional plus up to 10 seats, a private cohort, and an admin dashboard.  \n\nIf you’re looking to dive deeper into AI with real projects and mentor support, the **Professional tier** is the best fit. It balances depth and hands‑on experience without going to the full Team level.   Want to pick it, or is there something else you’d like to discuss?",
+        "at": "2026-07-01T07:01:04.338Z"
+      },
+      {
+        "stage": "payment",
+        "role": "assistant",
+        "text": "Your order for the Starter tier ($149) has been successfully processed. 🎉 We’re excited to have you on board – if you need any help, just let us know and we’ll connect you to a human representative right away.",
+        "at": "2026-07-01T07:01:19.416Z"
       }
     ],
     "chosenOption": {
@@ -30,9 +54,18 @@
       "name": "Starter",
       "price": 149
     },
-    "payment": null,
+    "payment": {
+      "status": "paid",
+      "method": "card",
+      "cardName": "123213",
+      "last4": "1231",
+      "amount": 149,
+      "currency": "USD",
+      "receiptNo": "OP-1A30FF0B",
+      "paidAt": "2026-07-01T07:01:15.548Z"
+    },
     "source": "journey-demo",
-    "createdAt": "2026-07-01T05:49:02.986Z",
-    "updatedAt": "2026-07-01T05:49:25.148Z"
+    "createdAt": "2026-07-01T07:00:20.798Z",
+    "updatedAt": "2026-07-01T07:01:19.417Z"
   }
 ]

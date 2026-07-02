@@ -14,7 +14,10 @@ interface AcquisitionProps {
   emailCaptured: boolean
   onAppend: (stage: StageId, ...msgs: Message[]) => void
   onEmail: (email: string) => void
+  // Neutral "next step" — moves to the retention follow-up (the normal walk).
   onAdvance: () => void
+  // Express lane — the customer explicitly wants to buy, so jump to the plans.
+  onSkipToPlans: () => void
 }
 
 export function Acquisition({
@@ -24,6 +27,7 @@ export function Acquisition({
   onAppend,
   onEmail,
   onAdvance,
+  onSkipToPlans,
 }: AcquisitionProps) {
   const [typing, setTyping] = useState(false)
 
@@ -33,10 +37,10 @@ export function Acquisition({
     const email = text.match(EMAIL_RE)?.[0]
     if (email) onEmail(email.toLowerCase())
 
-    // If they open by asking about pricing / wanting to buy, move them onward
-    // (to the retention follow-up, keeping the journey in order). Still fire the
-    // chat call in the background (when an email is present) so the lead is
-    // captured to journey.json before we move on.
+    // If they explicitly ask about pricing / want to buy, take them straight to
+    // the plans (Conversion) — that's what they asked for. Still fire the chat
+    // call in the background (when an email is present) so the lead is captured
+    // to journey.json before we move on.
     if (wantsPlans(text)) {
       onAppend('acquisition', user)
       if (email) {
@@ -44,7 +48,7 @@ export function Acquisition({
           () => {},
         )
       }
-      onAdvance()
+      onSkipToPlans()
       return
     }
 
